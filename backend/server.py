@@ -652,9 +652,12 @@ async def seed_admin():
             "created_at": datetime.now(timezone.utc).isoformat(),
         })
     # Write test credentials
-    os.makedirs("/app/memory", exist_ok=True)
-    with open("/app/memory/test_credentials.md", "w") as f:
-        f.write(f"# Test Credentials\n\n## Admin\n- Email: {admin_email}\n- Password: {admin_password}\n- Role: admin\n\n## Auth Endpoints\n- POST /api/auth/register\n- POST /api/auth/login\n- POST /api/auth/logout\n- GET /api/auth/me\n- POST /api/auth/refresh\n- POST /api/auth/forgot-password\n- POST /api/auth/reset-password\n")
+    try:
+        os.makedirs("/app/memory", exist_ok=True)
+        with open("/app/memory/test_credentials.md", "w") as f:
+            f.write(f"# Test Credentials\n\n## Admin\n- Email: {admin_email}\n- Password: {admin_password}\n")
+    except Exception:
+        pass  # Skip file writing in production environments
 
 async def seed_concepts():
     count = await db.concepts.count_documents({})
