@@ -1,0 +1,115 @@
+{
+  "theme": "LIGHT",
+  "archetype": "Archetype 6 (Vibrant Play) + Archetype 3 (Pastel & Soft) with Neo-Brutalist Accessibility Contrast",
+  "design_philosophy": {
+    "core_principles": [
+      "Cognitive Clarity: Progressive disclosure, chunked information, and zero overwhelming layouts.",
+      "Motor Accessibility: Oversized interactive targets (min 56px), generous spacing, and predictable interactions.",
+      "High Contrast Pastels: Soft pastel backgrounds anchored by thick, hard dark borders and deep text colors for WCAG AAA compliance.",
+      "Encouraging Emotion: Joyful, calm, and safe environment using gentle bounce animations, floating elements, and a supportive mascot."
+    ],
+    "surface_strategy": "Tactile Neo-Brutalist / Soft Utility. Mix soft pastel backgrounds with sharp 2px-3px dark borders and solid drop-shadows (e.g., shadow-[4px_4px_0px_#0F172A]). This provides extreme visual clarity and boundary definition for users with cognitive or visual impairments."
+  },
+  "colors": {
+    "background": {
+      "main": "#FAFAFA",
+      "surface": "#FFFFFF"
+    },
+    "text": {
+      "primary": "#0F172A",
+      "secondary": "#334155",
+      "muted": "#64748B"
+    },
+    "brand": {
+      "sunshine_yellow": "#FFD166",
+      "lavender_mist": "#C8B6FF",
+      "mint_breeze": "#06D6A0",
+      "coral_glow": "#EF476F",
+      "sky_blue": "#118AB2",
+      "peach_cream": "#FFD6BA"
+    },
+    "interaction": {
+      "hover_darken": "rgba(15, 23, 42, 0.05)",
+      "focus_ring": "#118AB2",
+      "border": "#0F172A"
+    }
+  },
+  "typography": {
+    "font_families": {
+      "heading": "Fredoka, sans-serif",
+      "body": "Nunito, sans-serif"
+    },
+    "scales": {
+      "h1": "text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#0F172A]",
+      "h2": "text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-[#0F172A]",
+      "h3": "text-xl sm:text-2xl font-semibold text-[#0F172A]",
+      "body_large": "text-lg sm:text-xl font-medium leading-relaxed text-[#334155]",
+      "body": "text-base sm:text-lg font-medium leading-relaxed text-[#334155]",
+      "small": "text-sm font-bold uppercase tracking-wider text-[#64748B]"
+    },
+    "accessibility_rules": "All text must maintain a minimum 4.5:1 contrast ratio against its background. Prefer 7:1 (WCAG AAA) for body text. Use Deep Navy/Charcoal (#0F172A) on pastel backgrounds. Never use light grey text on white."
+  },
+  "layout_and_spacing": {
+    "grid_system": "Bento Grid Protocol (Mode A for Landing, Mode B for Dashboard). Ensure generous gaps (gap-6 to gap-8).",
+    "spacing_scale": "Use p-6, p-8, p-12 for containers. Interactive elements must have ample padding to prevent misclicks.",
+    "borders_and_shadows": "Cards and Buttons: border-2 or border-3 border-[#0F172A] rounded-2xl shadow-[4px_4px_0px_#0F172A]. On hover/active: translate-y-[2px] shadow-[2px_2px_0px_#0F172A]."
+  },
+  "components": {
+    "buttons": "Large touch targets (min-h-[56px] or min-h-[64px]). Full rounded pills (rounded-full) or soft rectangles (rounded-2xl). Always include an icon alongside text for cognitive reinforcement.",
+    "cards": "Solid background colors (from pastel palette), thick dark borders, and offset solid shadows. Content must be left-aligned for reading ease.",
+    "navigation": "Sticky top header with glassmorphism or solid background. Clear, bold text links. Desktop must show links, mobile uses a large, accessible hamburger menu.",
+    "forms": "Inputs must have border-2, rounded-xl, text-lg, and a highly visible focus ring (focus:ring-4 focus:ring-sky_blue focus:outline-none).",
+    "data_testid": "MANDATORY: All interactive elements must have a data-testid attribute (e.g., data-testid='login-button', data-testid='lesson-card')."
+  },
+  "motion_and_interaction": {
+    "hover_states": "Gentle lift transforms on cards (y: -4). Buttons should have a bounce animation on click (scale: 0.95).",
+    "floating_elements": "Mascots and decorative elements should have a gentle, slow floating animation (y: [0, -10, 0], transition: 4s ease-in-out infinite).",
+    "rewards": "Trigger confetti animations (using react-confetti) for achievements and lesson completions.",
+    "accessibility": "Must respect prefers-reduced-motion CSS media query. Provide a global toggle in Settings to disable all animations and parallax effects."
+  },
+  "libraries": {
+    "icons": "lucide-react (thick stroke width for clarity)",
+    "animations": "framer-motion",
+    "charts": "recharts (Analytics)",
+    "data_visualization": "d3 (Knowledge Graph - force directed)",
+    "effects": "react-confetti, @react-three/fiber (for 3D companion/breathing UI if needed, otherwise use framer-motion for 2.5D)"
+  },
+  "media": {
+    "hero_mascot": {
+      "url": "https://static.prod-images.emergentagent.com/jobs/3e9d1e6d-1ec4-4242-b98e-375a3fb3e12c/images/0d5a58ad11917c107d19197bb800270b2ab4affe5ac9d9ef444167284e0b11be.png",
+      "description": "3D robotic owl companion in soft pastel peach/blue. Use in hero section and dashboard as the floating guide."
+    },
+    "learning_landscape": {
+      "url": "https://static.prod-images.emergentagent.com/jobs/3e9d1e6d-1ec4-4242-b98e-375a3fb3e12c/images/d768e2d57c1ea4e6adc5a1a1cc5d863791881aaa60a6b554902f31f95485ca90.png",
+      "description": "Magical 2.5D isometric learning landscape. Use as the background for the Onboarding or Dashboard Progress Map."
+    },
+    "breathing_orb": {
+      "url": "https://static.prod-images.emergentagent.com/jobs/3e9d1e6d-1ec4-4242-b98e-375a3fb3e12c/images/11d923b2a3fe0748d26ac2545f83ed937d3bae7e5b7961490d602369f27f650f.png",
+      "description": "Soft glowing gradient orb. Use in the Breathing/Meditation Interface section."
+    },
+    "avatars_set": {
+      "url": "https://static.prod-images.emergentagent.com/jobs/3e9d1e6d-1ec4-4242-b98e-375a3fb3e12c/images/9912cdee44a5b79a025e461f2c5c75ebcd5d0d404c6caa2b8797127827dce2a2.png",
+      "description": "Set of 3D animal avatars. Use in the Login/Signup Avatar selection screen."
+    },
+    "classroom_kids_1": {
+      "url": "https://images.pexels.com/photos/8617938/pexels-photo-8617938.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "description": "Diverse school children raising hands. Use in Landing page 'About' or 'Community' section."
+    },
+    "classroom_kids_2": {
+      "url": "https://images.pexels.com/photos/8613089/pexels-photo-8613089.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "description": "Teacher reading to kids. Use in Landing page features."
+    }
+  },
+  "pages_instructions": {
+    "landing": "Use the learning_landscape as a background with a translucent white overlay (bg-white/80). Hero text must be massive and dark. Display the floating hero_mascot prominently.",
+    "login_signup": "Create a 2-column layout or a centered thick-bordered card. Large input fields. Avatar selection grid using avatars_set.",
+    "onboarding": "4-step progressive wizard. One concept per screen. Massive 'Next' buttons.",
+    "dashboard": "Bento grid layout. Top section for Mascot and welcome. Cards for XP, Streaks, and Achievements. Progress bars must be thick (h-6) with rounded-full.",
+    "lesson_page": "High contrast text area. Add a prominent 'Read Aloud' button. Content chunking is critical.",
+    "knowledge_graph": "Full-screen container for D3.js. Nodes must use the pastel brand colors with dark borders and thick focus rings for accessibility.",
+    "analytics": "Use Recharts. Line and Bar charts must use the distinct brand colors (Yellow, Coral, Blue, Mint).",
+    "settings": "Large toggle switches for accessibility controls (High Contrast, Reduce Motion, Dyslexia Font).",
+    "breathing_interface": "Full screen, dark or deep lavender background. Center the breathing_orb image and use Framer Motion to scale it up/down mapped to a 4-7-8 breathing text prompt.",
+    "404_error": "Playful page featuring the hero_mascot looking confused. Large 'Go Home' CTA."
+  }
+}
