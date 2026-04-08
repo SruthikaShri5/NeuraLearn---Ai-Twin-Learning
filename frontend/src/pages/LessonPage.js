@@ -1,33 +1,9 @@
-Connect to NeuraLearn
-1
-Set up connection security
-2
-Choose a connection method
-3
-Connect
-You need to secure your MongoDB Atlas cluster before you can use it. Set which users and IP addresses can access your cluster now. Read more 
-
-Add a connection IP address
-Your current IP address (106.192.73.204) has been added to enable local connectivity. Only an IP address you add to your Access List will be able to connect to your project's clusters. Add more later in Network Access.
-Create a database user
-This first user will have atlasAdmin  permissions for this project.
-
-You'll need your database user's credentials in the next step. Copy the database user password.
-Username
-sruthika
-Password
-sruthika@12345
-Hide
-
-
-Close
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import api from "@/lib/api";
-import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, ArrowRight, Check, X, BookOpen, Brain, Trophy, Sparkles, RefreshCw } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, BookOpen, Brain, Trophy, Sparkles, RefreshCw } from "lucide-react";
 import Confetti from "react-confetti";
 import { vibrate } from "@/lib/haptics";
 import { playFeedback } from "@/lib/soundscape";
