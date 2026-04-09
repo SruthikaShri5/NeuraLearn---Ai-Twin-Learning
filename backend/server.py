@@ -1024,7 +1024,6 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",
         "https://neuralearn-frontend-m0q3.onrender.com",
-        "*"
     ],
     allow_credentials=True,
     allow_methods=["*"],
