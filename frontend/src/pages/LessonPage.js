@@ -1,19 +1,77 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import api from "@/lib/api";
+import { useAuth } from "@/lib/auth-context";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, ArrowRight, Check, BookOpen, Brain, Trophy, Sparkles, RefreshCw } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, BookOpen, Brain, Trophy, Sparkles, RefreshCw, Volume2, Eye } from "lucide-react";
 import Confetti from "react-confetti";
 import { vibrate } from "@/lib/haptics";
 import { playFeedback } from "@/lib/soundscape";
 
+// Disability-adaptive helpers
+function getAdaptiveStyles(disabilityType) {
+  switch (disabilityType) {
+    case "visual":
+      return {
+        fontSize: "text-xl",
+        lineHeight: "leading-loose",
+        contrast: "bg-[#0F172A] text-white",
+        cardBg: "bg-[#1e293b]",
+        hint: "High contrast mode for visual impairment",
+        icon: "👁️",
+      };
+    case "hearing":
+      return {
+        fontSize: "text-lg",
+        lineHeight: "leading-relaxed",
+        contrast: "",
+        cardBg: "",
+        hint: "Visual cues enhanced — no audio dependency",
+        icon: "👂",
+        showCaptions: true,
+      };
+    case "motor":
+      return {
+        fontSize: "text-lg",
+        lineHeight: "leading-relaxed",
+        contrast: "",
+        cardBg: "",
+        hint: "Large touch targets for motor accessibility",
+        icon: "🖐️",
+        largeTargets: true,
+      };
+    case "cognitive":
+      return {
+        fontSize: "text-lg",
+        lineHeight: "leading-loose",
+        contrast: "",
+        cardBg: "bg-[#FFFBEB]",
+        hint: "Simplified layout for cognitive accessibility",
+        icon: "🧠",
+        simplified: true,
+      };
+    case "speech":
+      return {
+        fontSize: "text-lg",
+        lineHeight: "leading-relaxed",
+        contrast: "",
+        cardBg: "",
+        hint: "Text-based interaction — no speech required",
+        icon: "💬",
+      };
+    default:
+      return { fontSize: "text-lg", lineHeight: "leading-relaxed", contrast: "", cardBg: "", hint: null, icon: null };
+  }
+}
+
 export default function LessonPage() {
   const { lessonId } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [lesson, setLesson] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [phase, setPhase] = useState("learn"); // learn | quiz | results
+  const [phase, setPhase] = useState("learn");
   const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState({});
   const [selected, setSelected] = useState(null);
@@ -21,6 +79,8 @@ export default function LessonPage() {
   const [showConfetti, setShowConfetti] = useState(false);
   const [startTime] = useState(Date.now());
   const [nextReviewDate, setNextReviewDate] = useState(null);
+
+  const adaptive = getAdaptiveStyles(user?.disability_type);
 
   useEffect(() => {
     const fetchLesson = async () => {
@@ -88,7 +148,7 @@ export default function LessonPage() {
   const currentQuestion = quiz[currentQ];
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA]" data-testid="lesson-page">
+    <div className={`min-h-screen ${adaptive.contrast || 'bg-[#FAFAFA]'}`} data-testid="lesson-page">
       {showConfetti && <Confetti recycle={false} numberOfPieces={300} onConfettiComplete={() => setShowConfetti(false)} />}
 
       {/* Header */}
@@ -97,56 +157,91 @@ export default function LessonPage() {
           <Link to="/dashboard" className="flex items-center gap-2 text-[#334155] hover:text-[#0F172A]" data-testid="lesson-back-link">
             <ArrowLeft className="w-5 h-5" /> Dashboard
           </Link>
-          <Badge className="bg-[#118AB2]/10 text-[#118AB2] border-2 border-[#118AB2]">
-            {lesson.subject === 'mathematics' ? 'Math' : 'Science'} - {lesson.grade?.replace("_", " ")}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge className="bg-[#118AB2]/10 text-[#118AB2] border-2 border-[#118AB2]">
+              {lesson.subject === 'mathematics' ? 'Math' : 'Science'} - {lesson.grade?.replace("_", " ")}
+            </Badge>
+            {adaptive.icon && (
+              <span className="text-lg" title={adaptive.hint} aria-label={adaptive.hint}>
+                {adaptive.icon}
+              </span>
+            )}
+          </div>
         </div>
       </nav>
+
+      {/* Accessibility hint banner */}
+      {adaptive.hint && (
+        <div className="bg-[#118AB2]/10 border-b border-[#118AB2]/20 px-6 py-2 text-center">
+          <p className="text-xs font-semibold text-[#118AB2]">{adaptive.hint}</p>
+        </div>
+      )}
 
       <main id="main-content" className="max-w-4xl mx-auto px-6 py-8">
         {/* Learning Phase */}
         {phase === "learn" && (
           <div className="space-y-6" data-testid="lesson-learn-phase">
-            <h1 className="text-3xl font-bold text-[#0F172A]" style={{ fontFamily: 'Fredoka, sans-serif' }}>
+            <h1 className={`text-3xl font-bold ${adaptive.contrast ? 'text-white' : 'text-[#0F172A]'}`} style={{ fontFamily: 'Fredoka, sans-serif' }}>
               {lesson.title}
             </h1>
 
             {/* Introduction */}
-            <div className="neura-card p-6 bg-[#118AB2]/5">
+            <div className={`neura-card p-6 ${adaptive.cardBg || 'bg-[#118AB2]/5'}`}>
               <div className="flex items-center gap-2 mb-3">
                 <BookOpen className="w-5 h-5 text-[#118AB2]" />
                 <h2 className="font-bold text-[#0F172A]" style={{ fontFamily: 'Fredoka, sans-serif' }}>Introduction</h2>
               </div>
-              <p className="text-[#334155] text-lg leading-relaxed">{lesson.introduction}</p>
+              <p className={`${adaptive.fontSize} ${adaptive.lineHeight} text-[#334155]`}>{lesson.introduction}</p>
             </div>
 
             {/* Explanation */}
-            <div className="neura-card p-6">
+            <div className={`neura-card p-6 ${adaptive.cardBg || ''}`}>
               <div className="flex items-center gap-2 mb-3">
                 <Brain className="w-5 h-5 text-[#C8B6FF]" />
                 <h2 className="font-bold text-[#0F172A]" style={{ fontFamily: 'Fredoka, sans-serif' }}>Let's Learn</h2>
               </div>
-              <p className="text-[#334155] text-lg leading-relaxed">{lesson.explanation}</p>
+              <p className={`${adaptive.fontSize} ${adaptive.lineHeight} text-[#334155]`}>{lesson.explanation}</p>
             </div>
 
-            {/* Examples */}
-            <div className="neura-card p-6 bg-[#FFD166]/10">
-              <div className="flex items-center gap-2 mb-3">
-                <Sparkles className="w-5 h-5 text-[#FFD166]" />
-                <h2 className="font-bold text-[#0F172A]" style={{ fontFamily: 'Fredoka, sans-serif' }}>Examples</h2>
+            {/* Examples — simplified for cognitive disability */}
+            {!adaptive.simplified ? (
+              <div className={`neura-card p-6 ${adaptive.cardBg || 'bg-[#FFD166]/10'}`}>
+                <div className="flex items-center gap-2 mb-3">
+                  <Sparkles className="w-5 h-5 text-[#FFD166]" />
+                  <h2 className="font-bold text-[#0F172A]" style={{ fontFamily: 'Fredoka, sans-serif' }}>Examples</h2>
+                </div>
+                <div className="space-y-4">
+                  {lesson.examples?.map((ex, i) => (
+                    <div key={i} className="p-4 bg-white rounded-xl border-2 border-[#0F172A]">
+                      <p className={`font-bold text-[#0F172A] ${adaptive.fontSize}`}>{ex.problem}</p>
+                      <p className="text-[#118AB2] font-bold mt-1">Answer: {ex.answer}</p>
+                      <p className="text-[#334155] text-sm mt-1">{ex.explanation}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div className="space-y-4">
-                {lesson.examples?.map((ex, i) => (
-                  <div key={i} className="p-4 bg-white rounded-xl border-2 border-[#0F172A]">
-                    <p className="font-bold text-[#0F172A] text-lg">{ex.problem}</p>
-                    <p className="text-[#118AB2] font-bold mt-1">Answer: {ex.answer}</p>
-                    <p className="text-[#334155] text-sm mt-1">{ex.explanation}</p>
+            ) : (
+              /* Cognitive: show one example at a time */
+              <div className="neura-card p-6 bg-[#FFFBEB]">
+                <div className="flex items-center gap-2 mb-3">
+                  <Sparkles className="w-5 h-5 text-[#FFD166]" />
+                  <h2 className="font-bold text-[#0F172A]" style={{ fontFamily: 'Fredoka, sans-serif' }}>Example</h2>
+                </div>
+                {lesson.examples?.[0] && (
+                  <div className="p-4 bg-white rounded-xl border-2 border-[#FFD166]">
+                    <p className="font-bold text-[#0F172A] text-xl">{lesson.examples[0].problem}</p>
+                    <p className="text-[#118AB2] font-bold mt-2 text-lg">✅ {lesson.examples[0].answer}</p>
+                    <p className="text-[#334155] mt-2">{lesson.examples[0].explanation}</p>
                   </div>
-                ))}
+                )}
               </div>
-            </div>
+            )}
 
-            <button onClick={() => setPhase("quiz")} className="neura-btn bg-[#06D6A0] text-[#0F172A] text-lg w-full h-14" data-testid="start-quiz-btn">
+            <button
+              onClick={() => setPhase("quiz")}
+              className={`neura-btn bg-[#06D6A0] text-[#0F172A] text-lg w-full ${adaptive.largeTargets ? 'h-20 text-xl' : 'h-14'}`}
+              data-testid="start-quiz-btn"
+            >
               <Trophy className="w-5 h-5" /> Take the Quiz!
             </button>
           </div>
@@ -172,13 +267,16 @@ export default function LessonPage() {
                   <button
                     key={opt}
                     onClick={() => handleAnswer(currentQuestion.id, opt)}
-                    className={`w-full p-4 rounded-xl border-2 text-left text-lg font-semibold transition-all ${
+                    className={`w-full rounded-xl border-2 text-left font-semibold transition-all ${
+                      adaptive.largeTargets ? 'p-6 text-xl' : 'p-4 text-lg'
+                    } ${
                       selected === opt
                         ? 'border-[#118AB2] bg-[#118AB2]/10 text-[#118AB2] shadow-[3px_3px_0px_#118AB2]'
                         : 'border-[#e2e8f0] text-[#334155] hover:border-[#0F172A]'
                     }`}
                     data-testid={`quiz-option-${opt}`}
                   >
+                    {selected === opt && <span className="mr-2">✓</span>}
                     {opt}
                   </button>
                 ))}

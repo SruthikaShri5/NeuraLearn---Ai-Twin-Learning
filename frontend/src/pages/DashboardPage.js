@@ -112,6 +112,23 @@ export default function DashboardPage() {
               Welcome back, {user?.name?.split(" ")[0] || "Learner"}!
             </h1>
             <p className="text-[#334155] mt-1">Ready to continue your learning adventure?</p>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {user?.grade_level && (
+                <span className="text-xs font-bold px-2 py-1 rounded-full bg-[#118AB2]/10 text-[#118AB2] border border-[#118AB2]">
+                  📚 {user.grade_level.replace("_", " ")}
+                </span>
+              )}
+              {user?.disability_type && user.disability_type !== "prefer_not_to_say" && (
+                <span className="text-xs font-bold px-2 py-1 rounded-full bg-[#C8B6FF]/30 text-[#7c3aed] border border-[#C8B6FF]">
+                  ♿ {user.disability_type} support
+                </span>
+              )}
+              {user?.learning_style && (
+                <span className="text-xs font-bold px-2 py-1 rounded-full bg-[#FFD166]/30 text-[#b8860b] border border-[#FFD166]">
+                  🎯 {user.learning_style} learner
+                </span>
+              )}
+            </div>
           </div>
           <button onClick={() => setBreathingActive(true)} className="neura-btn bg-[#C8B6FF] text-[#0F172A] whitespace-nowrap" data-testid="breathing-btn">
             <Wind className="w-5 h-5" /> Breathe

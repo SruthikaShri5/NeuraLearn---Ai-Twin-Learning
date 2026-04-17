@@ -487,7 +487,32 @@ async def get_schedule(user: dict = Depends(get_current_user)):
 # ============ KNOWLEDGE GRAPH ============
 
 @api_router.get("/knowledge-graph")
-async def get_knowledge_graph():
+async def get_knowledge_graph(request: Request):
+    # Filter concepts by student's grade level
+    try:
+        user = await get_current_user(request)
+        grade = user.get("grade_level")
+        role = user.get("role")
+        if role in ("student", "learner") and grade:
+            # Build grade order to include current + prerequisite grades
+            grade_order = [
+                "class_1","class_2","class_3","class_4","class_5","class_6",
+                "class_7","class_8","class_9","class_10","class_11","class_12",
+                "college_science","college_commerce","college_arts"
+            ]
+            try:
+                grade_idx = grade_order.index(grade)
+                # Include current grade and all previous grades (prerequisites)
+                allowed_grades = grade_order[:grade_idx + 1]
+            except ValueError:
+                allowed_grades = [grade]
+            concepts = await db.concepts.find(
+                {"grade": {"$in": allowed_grades}}, {"_id": 0}
+            ).to_list(200)
+            return {"concepts": concepts, "student_grade": grade}
+    except Exception:
+        pass
+    # Teachers, parents, admins see all concepts
     concepts = await db.concepts.find({}, {"_id": 0}).to_list(200)
     return {"concepts": concepts}
 

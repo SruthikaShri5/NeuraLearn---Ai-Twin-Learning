@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "@/lib/api";
 import { useAppStore } from "@/lib/store";
-import { Brain, ArrowLeft, Search } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
+import { Brain, ArrowLeft } from "lucide-react";
 import * as d3 from "d3";
 
 const COLORS = {
@@ -12,12 +13,20 @@ const COLORS = {
   default: "#C8B6FF",
 };
 
+const SUBJECT_COLORS = {
+  mathematics: "#FFD166",
+  science: "#06D6A0",
+};
+
 export default function KnowledgeGraphPage() {
   const svgRef = useRef(null);
   const containerRef = useRef(null);
   const { concepts, mastery, setConcepts, setMastery } = useAppStore();
+  const { user } = useAuth();
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [studentGrade, setStudentGrade] = useState(null);
+  const [filterSubject, setFilterSubject] = useState("all");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -28,6 +37,7 @@ export default function KnowledgeGraphPage() {
         ]);
         setConcepts(cRes.data.concepts || []);
         setMastery(mRes.data.mastery || []);
+        if (cRes.data.student_grade) setStudentGrade(cRes.data.student_grade);
       } catch {} finally { setLoading(false); }
     };
     fetchData();
@@ -49,11 +59,21 @@ export default function KnowledgeGraphPage() {
       return COLORS.gap;
     };
 
-    const nodes = concepts.map((c) => ({ id: c.id, name: c.name, subject: c.subject, grade: c.grade, score: masteryMap[c.id] }));
+    // Filter by subject if selected
+    const filteredConcepts = filterSubject === "all"
+      ? concepts
+      : concepts.filter((c) => c.subject === filterSubject);
+
+    const nodes = filteredConcepts.map((c) => ({
+      id: c.id, name: c.name, subject: c.subject, grade: c.grade,
+      score: masteryMap[c.id]
+    }));
+
+    const nodeIds = new Set(nodes.map((n) => n.id));
     const links = [];
-    concepts.forEach((c) => {
+    filteredConcepts.forEach((c) => {
       (c.prerequisites || []).forEach((p) => {
-        if (concepts.find((n) => n.id === p)) {
+        if (nodeIds.has(p)) {
           links.push({ source: p, target: c.id });
         }
       });
@@ -95,17 +115,26 @@ export default function KnowledgeGraphPage() {
     node.append("circle")
       .attr("r", 18)
       .attr("fill", (d) => getColor(d.id))
-      .attr("stroke", "#0F172A")
-      .attr("stroke-width", 2.5)
+      .attr("stroke", (d) => SUBJECT_COLORS[d.subject] || "#0F172A")
+      .attr("stroke-width", 3)
       .style("cursor", "pointer");
 
     node.append("text")
       .text((d) => d.name.length > 10 ? d.name.slice(0, 10) + "..." : d.name)
       .attr("text-anchor", "middle")
-      .attr("dy", 35)
-      .attr("font-size", "11px")
+      .attr("dy", 32)
+      .attr("font-size", "10px")
       .attr("font-weight", "700")
       .attr("fill", "#0F172A")
+      .attr("font-family", "Nunito, sans-serif");
+
+    // Grade label below name
+    node.append("text")
+      .text((d) => d.grade?.replace("class_", "Cl.") || "")
+      .attr("text-anchor", "middle")
+      .attr("dy", 44)
+      .attr("font-size", "9px")
+      .attr("fill", "#64748B")
       .attr("font-family", "Nunito, sans-serif");
 
     node.on("click", (event, d) => {
@@ -134,8 +163,30 @@ export default function KnowledgeGraphPage() {
           </Link>
           <h1 className="text-lg font-bold text-[#0F172A]" style={{ fontFamily: 'Fredoka, sans-serif' }}>
             <Brain className="w-5 h-5 inline mr-1" /> Knowledge Graph
+            {studentGrade && (
+              <span className="ml-2 text-xs font-bold text-[#118AB2] bg-[#118AB2]/10 px-2 py-0.5 rounded-full border border-[#118AB2]">
+                {studentGrade.replace("_", " ")}
+              </span>
+            )}
           </h1>
-          <div className="w-24" />
+          {/* Subject filter */}
+          <div className="flex gap-2">
+            {["all", "mathematics", "science"].map((s) => (
+              <button
+                key={s}
+                onClick={() => setFilterSubject(s)}
+                className={`px-3 py-1 rounded-full text-xs font-bold border-2 transition-all ${
+                  filterSubject === s
+                    ? s === "mathematics" ? "bg-[#FFD166] border-[#0F172A]"
+                    : s === "science" ? "bg-[#06D6A0]/30 border-[#0F172A]"
+                    : "bg-[#0F172A] text-white border-[#0F172A]"
+                    : "bg-white border-[#e2e8f0] text-[#64748B]"
+                }`}
+              >
+                {s === "all" ? "All" : s === "mathematics" ? "Math" : "Science"}
+              </button>
+            ))}
+          </div>
         </div>
       </nav>
 
@@ -162,6 +213,18 @@ export default function KnowledgeGraphPage() {
                   <span className="text-xs font-semibold text-[#334155]">{item.label}</span>
                 </div>
               ))}
+              <div className="border-t border-[#e2e8f0] pt-2 mt-2">
+                <p className="font-bold text-xs text-[#0F172A] mb-1">Subject (border)</p>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded-full border-[3px]" style={{ borderColor: SUBJECT_COLORS.mathematics, backgroundColor: 'white' }} />
+                  <span className="text-xs text-[#334155]">Mathematics</span>
+                </div>
+                <div className="flex items-center gap-2 mt-1">
+                  <div className="w-4 h-4 rounded-full border-[3px]" style={{ borderColor: SUBJECT_COLORS.science, backgroundColor: 'white' }} />
+                  <span className="text-xs text-[#334155]">Science</span>
+                </div>
+              </div>
+              <p className="text-xs text-[#94a3b8] pt-1">{concepts.length} concepts shown</p>
             </div>
 
             {/* Selected concept detail */}
