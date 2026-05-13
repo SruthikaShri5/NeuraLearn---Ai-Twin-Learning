@@ -1,0 +1,14 @@
+{
+  "short_name": "NeuraLearn",
+  "name": "NeuraLearn - Adaptive Learning",
+  "description": "Adaptive learning ecosystem for specially-abled students",
+  "icons": [],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#118AB2",
+  "background_color": "#FAFAFA",
+  "orientation": "portrait-primary",
+  "categories": ["education"],
+  "lang": "en",
+  "scope": "/"
+}
