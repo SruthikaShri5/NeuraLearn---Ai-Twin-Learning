@@ -1,0 +1,8 @@
+INFO:     Started server process [508]
+INFO:     Waiting for application startup.
+2026-06-10 12:23:36,919 - root - INFO - Concepts synced: 270
+2026-06-10 12:23:37,159 - root - INFO - Lessons synced: 270
+INFO:     Application startup complete.
+ERROR:    [Errno 10048] error while attempting to bind on address ('127.0.0.1', 8000): only one usage of each socket address (protocol/network address/port) is normally permitted
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.

@@ -1,0 +1,27 @@
+# Environment files
+backend/.env
+frontend/.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Node
+frontend/node_modules/
+frontend/build/
+
+# Logs
+backend/backend.log
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test artifacts
+cookies.txt

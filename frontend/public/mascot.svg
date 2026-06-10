@@ -1,0 +1,42 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Body -->
+  <ellipse cx="100" cy="130" rx="55" ry="60" fill="#118AB2"/>
+  <!-- Head -->
+  <circle cx="100" cy="75" r="48" fill="#118AB2"/>
+  <!-- Ear tufts -->
+  <polygon points="68,35 58,10 82,28" fill="#0e6f8e"/>
+  <polygon points="132,35 142,10 118,28" fill="#0e6f8e"/>
+  <!-- Face plate -->
+  <ellipse cx="100" cy="80" rx="35" ry="32" fill="#FFD6BA"/>
+  <!-- Eye whites -->
+  <circle cx="85" cy="72" r="14" fill="white"/>
+  <circle cx="115" cy="72" r="14" fill="white"/>
+  <!-- Eye rings -->
+  <circle cx="85" cy="72" r="14" fill="none" stroke="#1A1A2E" stroke-width="2.5"/>
+  <circle cx="115" cy="72" r="14" fill="none" stroke="#1A1A2E" stroke-width="2.5"/>
+  <!-- Pupils -->
+  <circle cx="87" cy="72" r="8" fill="#1A1A2E"/>
+  <circle cx="117" cy="72" r="8" fill="#1A1A2E"/>
+  <!-- Eye shine -->
+  <circle cx="90" cy="68" r="3" fill="white"/>
+  <circle cx="120" cy="68" r="3" fill="white"/>
+  <!-- Beak -->
+  <polygon points="100,88 91,96 109,96" fill="#FF6B35"/>
+  <!-- Wings -->
+  <ellipse cx="52" cy="140" rx="22" ry="35" fill="#0e6f8e" transform="rotate(-15 52 140)"/>
+  <ellipse cx="148" cy="140" rx="22" ry="35" fill="#0e6f8e" transform="rotate(15 148 140)"/>
+  <!-- Belly spots -->
+  <ellipse cx="100" cy="145" rx="30" ry="32" fill="#FFD6BA" opacity="0.5"/>
+  <!-- Feet -->
+  <path d="M78 185 Q72 195 65 193 Q70 188 68 182" fill="#FF6B35"/>
+  <path d="M80 184 Q76 196 70 196 Q74 189 72 183" fill="#FF6B35"/>
+  <path d="M84 183 Q82 195 76 196 Q79 188 77 183" fill="#FF6B35"/>
+  <path d="M116 185 Q122 195 129 193 Q124 188 126 182" fill="#FF6B35"/>
+  <path d="M120 184 Q124 196 130 196 Q126 189 128 183" fill="#FF6B35"/>
+  <path d="M112 183 Q114 195 120 196 Q117 188 119 183" fill="#FF6B35"/>
+  <!-- Graduation cap -->
+  <rect x="65" y="30" width="70" height="8" rx="2" fill="#1A1A2E"/>
+  <polygon points="100,15 65,30 135,30" fill="#1A1A2E"/>
+  <line x1="135" y1="30" x2="145" y2="45" stroke="#FFD166" stroke-width="2.5"/>
+  <circle cx="145" cy="47" r="4" fill="#FFD166"/>
+</svg>

@@ -1,0 +1,234 @@
+
+/* ─── AUTO-EMPOWERMENT CLASSES ────────────────────────────────────────── */
+
+/* Dyslexia Empowerment */
+body.dyslexia-font {
+  font-family: 'OpenDyslexic', 'Comic Sans MS', cursive, sans-serif !important;
+  line-height: 1.8 !important;
+  word-spacing: 0.2rem !important;
+  letter-spacing: 0.05rem !important;
+}
+
+body.dyslexia-font p, body.dyslexia-font span, body.dyslexia-font h1, body.dyslexia-font h2, body.dyslexia-font h3 {
+  font-family: 'OpenDyslexic', 'Comic Sans MS', cursive, sans-serif !important;
+}
+
+/* High Contrast Empowerment */
+body.high-contrast {
+  --surface: #ffffff !important;
+  --text: #000000 !important;
+  --border: #000000 !important;
+  --shadow: #000000 !important;
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+body.high-contrast .neura-card {
+  border: 4px solid #000000 !important;
+  box-shadow: 8px 8px 0px #000000 !important;
+  background: #ffffff !important;
+}
+
+body.high-contrast button {
+  border: 3px solid #000000 !important;
+  box-shadow: 4px 4px 0px #000000 !important;
+}
+
+/* Large Targets Empowerment */
+body.large-targets button, 
+body.large-targets a.neura-btn,
+body.large-targets [role="button"] {
+  min-height: 60px !important;
+  min-width: 180px !important;
+  font-size: 1.25rem !important;
+  padding: 1rem 2rem !important;
+}
+
+/* Step Mode Empowerment (Visual layout simplification) */
+body.step-mode .neura-card {
+  border-style: dashed !important;
+  border-width: 3px !important;
+}
+
+body.step-mode .animate-pulse,
+body.step-mode .float-animation {
+  animation: none !important;
+}
+
+/* Visual Feedback Empowerment (for hearing impairment) */
+body.visual-feedback .neura-card:hover {
+  transform: scale(1.02) !important;
+  border-color: #06D6A0 !important;
+  box-shadow: 0 0 20px rgba(6, 214, 160, 0.4) !important;
+}
+
+/* ─── DISABILITY TRANSFORMATIONS (LEGACY / FALLBACK) ──────────────────── */
+
+/* Dyslexia Mode: Special font and spacing */
+body.disability-dyslexia {
+  font-family: 'OpenDyslexic', 'Comic Sans MS', cursive, sans-serif !important;
+  line-height: 1.8 !important;
+  word-spacing: 0.2rem !important;
+  letter-spacing: 0.05rem !important;
+}
+
+body.disability-dyslexia p, 
+body.disability-dyslexia span, 
+body.disability-dyslexia h1, 
+body.disability-dyslexia h2, 
+body.disability-dyslexia h3 {
+  font-family: 'OpenDyslexic', 'Comic Sans MS', cursive, sans-serif !important;
+}
+
+/* Visual (Auditory) Mode: High Contrast & Focus */
+body.disability-visual {
+  --surface: #ffffff !important;
+  --text: #000000 !important;
+  --border: #000000 !important;
+  --shadow: #000000 !important;
+}
+
+body.disability-visual *:focus {
+  outline: 5px solid #118AB2 !important;
+  outline-offset: 4px !important;
+  box-shadow: 0 0 0 10px rgba(17, 138, 178, 0.3) !important;
+}
+
+body.disability-visual .neura-card {
+  border-width: 4px !important;
+  box-shadow: 10px 10px 0px #000000 !important;
+}
+
+/* Hearing Mode: Visual cues and animations */
+body.disability-hearing .float-animation {
+  animation-duration: 1.5s !important;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+body.disability-hearing .neura-card:hover {
+  transform: scale(1.02) !important;
+  border-color: #118AB2 !important;
+}
+
+/* Cognitive Mode: Simplified UI */
+body.disability-cognitive .bg-gradient-to-br,
+body.disability-cognitive .bg-gradient-to-r,
+body.disability-cognitive .animate-pulse,
+body.disability-cognitive .float-animation {
+  background-image: none !important;
+  background-color: var(--surface) !important;
+  animation: none !important;
+}
+
+body.disability-cognitive .neura-card {
+  border-style: dashed !important;
+}
+
+/* Motor Mode: Extra large touch targets */
+body.disability-motor button,
+body.disability-motor a,
+body.disability-motor [role="button"] {
+  min-height: 64px !important;
+  padding-left: 2rem !important;
+  padding-right: 2rem !important;
+  font-size: 1.25rem !important;
+}
+
+body.disability-motor .neura-card {
+  padding: 2.5rem !important;
+}
+
+/* Speech Mode: Text-only, no mic/audio UI, calm layout */
+body.disability-speech {
+  --speech-accent: #EF476F;
+}
+
+body.disability-speech button[aria-label*="voice"],
+body.disability-speech button[aria-label*="speak"],
+body.disability-speech button[aria-label*="listen"],
+body.disability-speech [data-testid="voice-nav"],
+body.disability-speech [data-testid="voice-assistant"] {
+  display: none !important;
+}
+
+body.disability-speech .neura-card {
+  border-left: 4px solid #EF476F !important;
+}
+
+body.disability-speech input,
+body.disability-speech textarea {
+  font-size: 1.1rem !important;
+  padding: 0.75rem 1rem !important;
+  border: 2px solid #EF476F !important;
+  border-radius: 0.75rem !important;
+}
+
+/* ─── DASHBOARD LAYOUT ADAPTATIONS ───────────────────────────────────── */
+
+/* Visual: increase font size & contrast for all text */
+body.disability-visual p,
+body.disability-visual span,
+body.disability-visual h1,
+body.disability-visual h2,
+body.disability-visual h3,
+body.disability-visual label {
+  font-size: 1.1em !important;
+  color: #000000 !important;
+}
+
+body.disability-visual .neura-card {
+  background: #ffffff !important;
+}
+
+body.disability-visual nav {
+  border-bottom: 4px solid #000000 !important;
+}
+
+/* Hearing: highlight all interactive elements with visible green border */
+body.disability-hearing button,
+body.disability-hearing a {
+  border: 2px solid #06D6A0 !important;
+  position: relative;
+}
+
+body.disability-hearing .neura-card {
+  border-left: 5px solid #06D6A0 !important;
+}
+
+/* Hearing: hide all audio-only elements */
+body.disability-hearing [data-testid="soundscape-toggle-btn"],
+body.disability-hearing [data-testid="voice-nav"],
+body.disability-hearing [data-testid="voice-assistant"] {
+  display: none !important;
+}
+
+/* Cognitive: larger readable text, more spacing, no distracting animations */
+body.disability-cognitive p,
+body.disability-cognitive span,
+body.disability-cognitive li {
+  font-size: 1.1rem !important;
+  line-height: 2 !important;
+}
+
+body.disability-cognitive .neura-card {
+  margin-bottom: 1.5rem !important;
+  border-width: 2px !important;
+}
+
+body.disability-cognitive *,
+body.disability-cognitive *::before,
+body.disability-cognitive *::after {
+  animation-duration: 0s !important;
+  transition-duration: 0.1s !important;
+}
+
+/* Motor: all cards get extra padding, grid goes single column on mobile */
+body.disability-motor .neura-card {
+  margin-bottom: 1.5rem !important;
+}
+
+body.disability-motor nav a,
+body.disability-motor nav button {
+  min-width: 48px !important;
+  min-height: 48px !important;
+}
