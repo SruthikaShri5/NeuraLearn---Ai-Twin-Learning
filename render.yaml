@@ -29,7 +29,7 @@ services:
     name: neuralearn-frontend
     runtime: static
     rootDir: frontend
-    buildCommand: cd frontend && npm install --legacy-peer-deps && npm run build
+    buildCommand: cd frontend && unset NODE_OPTIONS && npm install --legacy-peer-deps && npm run build
     staticPublishPath: build
     envVars:
       - key: REACT_APP_BACKEND_URL
