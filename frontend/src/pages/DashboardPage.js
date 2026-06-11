@@ -583,10 +583,10 @@ export default function DashboardPage() {
         </div>
 
         {/* ── Two-column layout: main left, sidebar right ──────────────── */}
-        <div className="flex flex-col lg:flex-row gap-6">
+        <div className="flex flex-col lg:flex-row gap-6 lg:items-stretch">
 
           {/* ── LEFT: lessons + assignments ─────────────────────────────── */}
-          <div className="flex-1 min-w-0 flex flex-col">
+          <div className="flex-1 min-w-0">
 
             {/* Spaced Review Alert */}
             {dueReviews.length > 0 && (
@@ -628,7 +628,7 @@ export default function DashboardPage() {
                   <p className="text-base text-[#6B7280]">No lessons yet! Check back soon 🌟</p>
                 </div>
               ) : (
-                <div className="grid sm:grid-cols-2 gap-3 items-start">
+                <div className="grid sm:grid-cols-2 gap-3">
                   {(() => {
                     const grouped = safeLessons.reduce((acc, lesson) => {
                       const subject = lesson.subject || "Other";
@@ -657,8 +657,8 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* ── RIGHT SIDEBAR ── sticky so it fills the height ──────────── */}
-          <div className="w-full lg:w-72 xl:w-80 shrink-0 flex flex-col gap-4 lg:sticky lg:top-20">
+          {/* ── RIGHT SIDEBAR ──────────────────────────────────────────── */}
+          <div className="w-full lg:w-72 xl:w-80 shrink-0 flex flex-col gap-4 lg:self-start lg:sticky lg:top-20">
 
             {/* Recommendations */}
             {recommendations.length > 0 && (
