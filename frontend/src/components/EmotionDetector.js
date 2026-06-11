@@ -132,6 +132,10 @@ export default function EmotionDetector({ onClose }) {
   const startCamera = useCallback(async () => {
     stopAll();
     setErrorMsg(null);
+    // Reset video element before attaching new stream
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { width: 320, height: 240, facingMode: "user" },
@@ -140,14 +144,20 @@ export default function EmotionDetector({ onClose }) {
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current.onloadedmetadata = () => {
-          videoRef.current.play().catch(() => {});
-          setCameraActive(true);
+        const tryPlay = () => {
+          videoRef.current?.play()
+            .then(() => setCameraActive(true))
+            .catch(() => {
+              // Retry once after short delay (needed on some mobile browsers)
+              setTimeout(() => {
+                videoRef.current?.play().then(() => setCameraActive(true)).catch(() => {});
+              }, 300);
+            });
         };
-        // Fallback if onloadedmetadata already fired
         if (videoRef.current.readyState >= 1) {
-          videoRef.current.play().catch(() => {});
-          setCameraActive(true);
+          tryPlay();
+        } else {
+          videoRef.current.onloadedmetadata = tryPlay;
         }
       }
     } catch (err) {
