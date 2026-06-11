@@ -191,51 +191,45 @@ function AchievementsCard({ achievements, isJunior, headingFont }) {
 
 function SubjectGroupCard({ subject, lessons, colors, headingFont, isExpanded, onToggle, isSenior }) {
   return (
-    <div className={`overflow-hidden ${ isSenior ? "rounded-xl border border-[#E5E7EB] bg-white" : "neura-card bg-white"}`} data-testid={`subject-group-${subject}`}>
+    <div className={`overflow-hidden ${ isSenior ? "rounded-xl border border-[#E5E7EB] bg-white" : "rounded-2xl border-2 border-[#e2e8f0] bg-white"}`} data-testid={`subject-group-${subject}`}>
       <button
-        className={`w-full flex items-center justify-between px-4 py-3 transition-colors ${ isSenior ? "hover:bg-[#F8FAFC]" : "hover:bg-[#f8fafc]"}`}
+        className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-[#f8fafc] transition-colors"
         onClick={() => onToggle(subject)}
         aria-expanded={isExpanded}
         data-testid={`expand-${subject}`}
       >
-        <div className="flex items-center gap-2.5">
-          <span className={`text-xs font-semibold px-3 py-1 rounded ${
+        <div className="flex items-center gap-3">
+          <span className={`text-xs font-semibold px-3 py-1 rounded-full ${
             isSenior
               ? `${colors.bg} ${colors.text} border ${colors.border}`
-              : `font-black rounded-full border-2 border-[#1A1A2E] ${colors.bg} ${colors.text}`
+              : `font-black border-2 border-[#1A1A2E] ${colors.bg} ${colors.text}`
           }`}>
             {colors.label}
           </span>
-          <span className={`text-xs text-[#6B7280] ${ isSenior ? "" : "font-bold text-[#1A1A2E]"}`}>
+          <span className="text-sm text-[#6B7280]">
             {lessons.length} lesson{lessons.length !== 1 ? "s" : ""}
           </span>
         </div>
-        <ChevronDown className={`w-4 h-4 text-[#374151] shrink-0 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`} />
+        <ChevronDown className={`w-4 h-4 text-[#9CA3AF] shrink-0 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`} />
       </button>
       {isExpanded && (
-        <div className="flex flex-col gap-2 px-4 pb-4 border-t border-[#e2e8f0] pt-3 max-h-72 overflow-y-auto">
-          {lessons.map((lesson) => (
-            <Link key={lesson.id} to={`/lesson/${lesson.id}`} data-testid={`lesson-card-${lesson.id}`}>
-              <div className={`p-3 flex flex-col gap-1.5 transition-all cursor-pointer ${
-                isSenior
-                  ? "rounded-lg border border-[#E5E7EB] hover:border-[#118AB2] bg-[#FAFAFA] hover:bg-white"
-                  : "rounded-xl border-2 border-[#e2e8f0] hover:border-[#118AB2] bg-[#FAFAFA] hover:bg-white"
-              }`}>
-                <h3 className={`text-[#0F172A] leading-snug ${ isSenior ? "text-sm font-medium" : "font-bold text-sm"}`} style={headingFont}>
-                  {lesson.title}
-                </h3>
-                <p className="text-xs text-[#374151] line-clamp-2 leading-relaxed">{lesson.introduction}</p>
-                <div className="flex items-center justify-between mt-0.5">
-                  <span className="flex items-center gap-1 text-xs text-[#6B7280]">
-                    <Clock className="w-3 h-3" /> {lesson.quiz?.length || 0} questions
-                  </span>
-                  <span className={`text-xs font-medium ${ isSenior ? "text-indigo-600" : "font-bold text-[#118AB2]"}`}>
-                    Start <ArrowRight className="w-3 h-3 inline" />
-                  </span>
+        <div className="px-4 pb-4 border-t border-[#f1f5f9] pt-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-80 overflow-y-auto">
+            {lessons.map((lesson) => (
+              <Link key={lesson.id} to={`/lesson/${lesson.id}`} data-testid={`lesson-card-${lesson.id}`}>
+                <div className={`p-3 h-full flex flex-col gap-1 transition-all cursor-pointer ${
+                  isSenior
+                    ? "rounded-lg border border-[#E5E7EB] hover:border-[#118AB2] hover:shadow-sm bg-[#FAFAFA] hover:bg-white"
+                    : "rounded-xl border-2 border-[#e2e8f0] hover:border-[#118AB2] bg-[#FAFAFA] hover:bg-white"
+                }`}>
+                  <p className={`text-[#0F172A] leading-snug ${ isSenior ? "text-sm font-medium" : "font-bold text-sm"}`} style={headingFont}>
+                    {lesson.title}
+                  </p>
+                  <p className="text-xs text-[#6B7280] line-clamp-1 mt-auto">{lesson.quiz?.length || 0} questions</p>
                 </div>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            ))}
+          </div>
         </div>
       )}
     </div>
@@ -630,42 +624,29 @@ export default function DashboardPage() {
                   <p className="text-base text-[#6B7280]">No lessons yet! Check back soon 🌟</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {(() => {
-                    const grouped = safeLessons.reduce((acc, lesson) => {
+                <div className="flex flex-col gap-2">
+                  {Object.entries(
+                    safeLessons.reduce((acc, lesson) => {
                       const subject = lesson.subject || "Other";
                       if (!acc[subject]) acc[subject] = [];
                       acc[subject].push(lesson);
                       return acc;
-                    }, {});
-                    const entries = Object.entries(grouped);
-                    // If odd number of subjects, add a spacer to fill the grid
-                    const cards = entries.map(([subject, subjectLessons]) => {
-                      const sc = subjectColors[subject] || { bg: "bg-[#f1f5f9]", border: "border-[#e2e8f0]", text: "text-[#374151]", label: subject };
-                      return (
-                        <SubjectGroupCard
-                          key={subject}
-                          subject={subject}
-                          lessons={subjectLessons}
-                          colors={sc}
-                          headingFont={headingFont}
-                          isExpanded={expandedSubject === subject}
-                          onToggle={(s) => setExpandedSubject((prev) => (prev === s ? null : s))}
-                          isSenior={isSenior}
-                        />
-                      );
-                    });
-                    if (entries.length % 2 !== 0) {
-                      cards.push(
-                        <div key="__spacer" className={`rounded-xl border-2 border-dashed flex items-center justify-center p-6 text-sm ${
-                          isSenior ? "border-[#E5E7EB] text-[#9CA3AF]" : "border-[#e2e8f0] text-[#94a3b8]"
-                        }`}>
-                          {isJunior ? "🌟 More subjects coming soon!" : "More subjects coming soon"}
-                        </div>
-                      );
-                    }
-                    return cards;
-                  })()}
+                    }, {})
+                  ).map(([subject, subjectLessons]) => {
+                    const sc = subjectColors[subject] || { bg: "bg-[#f1f5f9]", border: "border-[#e2e8f0]", text: "text-[#374151]", label: subject };
+                    return (
+                      <SubjectGroupCard
+                        key={subject}
+                        subject={subject}
+                        lessons={subjectLessons}
+                        colors={sc}
+                        headingFont={headingFont}
+                        isExpanded={expandedSubject === subject}
+                        onToggle={(s) => setExpandedSubject((prev) => (prev === s ? null : s))}
+                        isSenior={isSenior}
+                      />
+                    );
+                  })}
                 </div>
               )}
             </div>
