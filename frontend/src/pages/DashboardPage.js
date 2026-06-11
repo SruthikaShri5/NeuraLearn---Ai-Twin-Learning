@@ -585,12 +585,12 @@ export default function DashboardPage() {
         {/* ── Two-column layout: main left, sidebar right ──────────────── */}
         <div className="flex flex-col lg:flex-row gap-6 lg:items-stretch">
 
-          {/* ── LEFT: lessons + assignments ─────────────────────────────── */}
-          <div className="flex-1 min-w-0">
+          {/* ── LEFT ──────────────────────────────────────────────── */}
+          <div className="flex-1 min-w-0 flex flex-col gap-4">
 
             {/* Spaced Review Alert */}
             {dueReviews.length > 0 && (
-              <div className={`p-4 mb-5 flex items-center gap-3 ${
+              <div className={`p-4 flex items-center gap-3 ${
                 isSenior
                   ? "rounded-xl border border-amber-200 bg-amber-50"
                   : "neura-card bg-[#FFD166]/10 border-[#FFD166]"
@@ -618,17 +618,19 @@ export default function DashboardPage() {
             <AssignmentsList />
 
             {/* Lessons Section */}
-            <div data-testid="lessons-section">
+            <div data-testid="lessons-section" className={`rounded-2xl p-4 ${
+              isSenior ? "bg-white border border-[#E5E7EB]" : "bg-white border border-[#e2e8f0] neura-card"
+            }`}>
               <h2 className={`mb-4 ${isSenior ? "text-base font-semibold text-[#1A1A2E] tracking-tight" : "font-bold text-lg text-[#1A1A2E]"}`} style={headingFont}>
                 {isSenior ? "Your Subjects" : "📚 Your Subjects"}
               </h2>
               {safeLessons.length === 0 ? (
-                <div className="neura-card p-10 text-center bg-white">
+                <div className="p-10 text-center">
                   <BookOpen className="w-10 h-10 text-[#64748B] mx-auto mb-2" />
                   <p className="text-base text-[#6B7280]">No lessons yet! Check back soon 🌟</p>
                 </div>
               ) : (
-                <div className="grid sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {(() => {
                     const grouped = safeLessons.reduce((acc, lesson) => {
                       const subject = lesson.subject || "Other";
@@ -636,7 +638,9 @@ export default function DashboardPage() {
                       acc[subject].push(lesson);
                       return acc;
                     }, {});
-                    return Object.entries(grouped).map(([subject, subjectLessons]) => {
+                    const entries = Object.entries(grouped);
+                    // If odd number of subjects, add a spacer to fill the grid
+                    const cards = entries.map(([subject, subjectLessons]) => {
                       const sc = subjectColors[subject] || { bg: "bg-[#f1f5f9]", border: "border-[#e2e8f0]", text: "text-[#374151]", label: subject };
                       return (
                         <SubjectGroupCard
@@ -651,6 +655,16 @@ export default function DashboardPage() {
                         />
                       );
                     });
+                    if (entries.length % 2 !== 0) {
+                      cards.push(
+                        <div key="__spacer" className={`rounded-xl border-2 border-dashed flex items-center justify-center p-6 text-sm ${
+                          isSenior ? "border-[#E5E7EB] text-[#9CA3AF]" : "border-[#e2e8f0] text-[#94a3b8]"
+                        }`}>
+                          {isJunior ? "🌟 More subjects coming soon!" : "More subjects coming soon"}
+                        </div>
+                      );
+                    }
+                    return cards;
                   })()}
                 </div>
               )}
