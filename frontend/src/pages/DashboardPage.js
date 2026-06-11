@@ -444,15 +444,15 @@ export default function DashboardPage() {
         />
 
         {/* ── Welcome Card ──────────────────────────────────────────────── */}
-        <div data-testid="welcome-card" className="mb-4 rounded-2xl border-2 border-[#1A1A2E] overflow-hidden"
-          style={{ boxShadow: "5px 5px 0px #1A1A2E", background: isJunior
+        <div data-testid="welcome-card" className="mb-4 rounded-2xl border border-[#1A1A2E]/30 overflow-hidden"
+          style={{ boxShadow: "2px 2px 0px rgba(26,26,46,0.3)", background: isJunior
             ? "linear-gradient(135deg, #e0f7ff 0%, #fff9e6 50%, #e6fff5 100%)"
             : "linear-gradient(135deg, #f0f4ff 0%, #fafafa 60%, #f0fff8 100%)" }}>
           <div className="p-6 flex flex-col sm:flex-row items-center gap-5">
             {/* Avatar + glow */}
             <div className="relative shrink-0">
-              <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-4xl border-2 border-[#1A1A2E]"
-                style={{ background: "linear-gradient(135deg, #118AB2 0%, #06D6A0 100%)", boxShadow: "3px 3px 0 #1A1A2E" }}>
+              <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-4xl border border-[#1A1A2E]/30"
+                style={{ background: "linear-gradient(135deg, #118AB2 0%, #06D6A0 100%)", boxShadow: "1px 1px 0 rgba(26,26,46,0.3)" }}>
                 {AVATARS[user?.avatar] || "🦉"}
               </div>
               <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-[#06D6A0] border-2 border-white flex items-center justify-center text-[10px]">✓</span>
@@ -479,8 +479,8 @@ export default function DashboardPage() {
             </div>
             {/* Breathe btn */}
             <button onClick={() => setBreathingActive(true)}
-              className="shrink-0 inline-flex flex-col items-center gap-1 px-5 py-3 rounded-2xl border-2 border-[#1A1A2E] bg-white hover:bg-[#f1f5f9] font-bold text-[#1A1A2E] transition-all"
-              style={{ boxShadow: "3px 3px 0 #1A1A2E" }}
+              className="shrink-0 inline-flex flex-col items-center gap-1 px-5 py-3 rounded-2xl border border-[#1A1A2E]/30 bg-white hover:bg-[#f1f5f9] font-bold text-[#1A1A2E] transition-all"
+              style={{ boxShadow: "1px 1px 0 rgba(26,26,46,0.3)" }}
               data-testid="breathing-btn">
               <Wind className="w-5 h-5 text-[#118AB2]" />
               <span className="text-xs">Breathe</span>
@@ -491,7 +491,7 @@ export default function DashboardPage() {
         </div>
 
         {/* ── Stats Grid ─────────────────────────────────────────────────── */}
-        <div className="grid grid-cols-4 gap-3 mb-4" data-testid="stats-grid">
+        <div className="grid grid-cols-4 gap-2 mb-4" data-testid="stats-grid">
           {[
             { icon: Zap,    label: "XP",      value: xp,               color: "text-[#118AB2]", bg: "bg-white" },
             { icon: Flame,  label: "Streak",  value: `${streak}d`,     color: "text-[#EF476F]", bg: "bg-white" },
@@ -507,11 +507,11 @@ export default function DashboardPage() {
         </div>
 
         {/* ── XP Progress ────────────────────────────────────────────────── */}
-        <div className="mb-4 rounded-2xl border-2 border-[#1A1A2E] p-4 bg-white"
-          style={{ boxShadow: "4px 4px 0px #1A1A2E" }}>
+        <div className="mb-4 rounded-2xl border border-[#1A1A2E]/20 p-4 bg-white"
+          style={{ boxShadow: "0 1px 6px rgba(0,0,0,0.07)" }}>
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-[#FFD166] border-2 border-[#1A1A2E] flex items-center justify-center">
+              <div className="w-7 h-7 rounded-lg bg-[#FFD166] border border-[#1A1A2E]/20 flex items-center justify-center">
                 <Zap className="w-3.5 h-3.5 text-[#1A1A2E]" />
               </div>
               <span className="text-sm font-black text-[#1A1A2E]">Level {level} Progress</span>
@@ -523,7 +523,7 @@ export default function DashboardPage() {
             </div>
           </div>
           {/* Custom progress bar */}
-          <div className="w-full h-4 rounded-full bg-[#f1f5f9] border-2 border-[#1A1A2E] overflow-hidden">
+          <div className="w-full h-3 rounded-full bg-[#f1f5f9] border border-[#e2e8f0] overflow-hidden">
             <div
               className="h-full rounded-full transition-all duration-700 ease-out"
               style={{
@@ -568,7 +568,7 @@ export default function DashboardPage() {
         {/* ── Learning Twin DNA Card ──────────────────────────────────── */}
         {user?.learning_profile && (
           <div data-testid="dna-card" className="mb-4 rounded-2xl p-4 border-2 border-[#1A1A2E]"
-            style={{ background: "#1A1A2E", boxShadow: "4px 4px 0px #000" }}>
+            style={{ background: "#1A1A2E", boxShadow: "2px 2px 0px #000" }}>
             <div className="flex items-center gap-2 mb-3">
               <span className="text-base">🧬</span>
               <p className="font-bold text-sm" style={{ color: "#C8B6FF", fontFamily: "Space Grotesk, sans-serif" }}>Your Learning Twin DNA</p>
