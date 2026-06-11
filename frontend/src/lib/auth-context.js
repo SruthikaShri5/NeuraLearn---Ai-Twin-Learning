@@ -44,13 +44,19 @@ export function AuthProvider({ children }) {
   }, []);
 
   const checkAuth = useCallback(async () => {
+    // Check token exists first — no token = not logged in, no need to hit backend
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+      setUser(false);
+      setLoading(false);
+      return;
+    }
     try {
-      // Try with existing token first
       const { data } = await api.get("/auth/me");
       setUser(data.user);
       applyUserSettings(data.user);
     } catch {
-      // Token expired or missing — try silent refresh
+      // Token expired — try silent refresh
       try {
         const { data: refreshData } = await api.post("/auth/refresh");
         if (refreshData.access_token) {

@@ -1,21 +1,10 @@
-/* NeuraLearn Service Worker v2 — Full Offline Support */
-const CACHE_NAME = 'neuralearn-v6';
-const API_CACHE = 'neuralearn-api-v6';
+/* NeuraLearn Service Worker v7 — Fixed cache strategy */
+const CACHE_NAME = 'neuralearn-v7';
+const API_CACHE = 'neuralearn-api-v7';
 
-// Core app shell — simplified for development and production reliability
-const SHELL_ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-];
+const SHELL_ASSETS = ['/manifest.json', '/mascot.svg'];
 
-// API endpoints to pre-cache
-const API_PRECACHE = [
-  '/api/lessons',
-  '/api/knowledge-graph',
-];
-
-// ── Install: cache app shell ───────────────────────────────────────────────
+// Install: cache only non-html shell assets
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) =>
@@ -25,7 +14,7 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
-// ── Activate: clean old caches ─────────────────────────────────────────────
+// Activate: clean old caches immediately
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
@@ -39,87 +28,60 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// ── Fetch strategy ─────────────────────────────────────────────────────────
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // Skip non-GET
   if (request.method !== 'GET') return;
 
-  // API calls: network-only, never cache (contains auth tokens)
-  if (url.pathname.startsWith('/api/')) {
+  // API: network-only
+  if (url.hostname.includes('onrender.com') || url.pathname.startsWith('/api/')) {
     event.respondWith(
       fetch(request).catch(() =>
-        new Response(
-          JSON.stringify({ error: 'offline', message: 'You are offline.' }),
-          { headers: { 'Content-Type': 'application/json' } }
-        )
+        new Response(JSON.stringify({ error: 'offline' }), { headers: { 'Content-Type': 'application/json' } })
       )
     );
     return;
   }
 
-  // Static assets: cache-first, network fallback
+  // HTML navigation: network-first, fallback to cache (NEVER serve stale index.html first)
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      fetch(request)
+        .then((res) => {
+          const clone = res.clone();
+          caches.open(CACHE_NAME).then((c) => c.put(request, clone));
+          return res;
+        })
+        .catch(() => caches.match('/index.html').then((r) => r || fetch('/index.html')))
+    );
+    return;
+  }
+
+  // JS/CSS/images: cache-first (these are content-hashed so safe to cache)
   event.respondWith(
     caches.match(request).then((cached) => {
       if (cached) return cached;
-      return fetch(request)
-        .then((res) => {
-          if (res.status === 200) {
-            const clone = res.clone();
-            caches.open(CACHE_NAME).then((c) => c.put(request, clone));
-          }
-          return res;
-        })
-        .catch(() => {
-          if (request.mode === 'navigate') {
-            // Fallback to index.html for SPA routing
-            return caches.match('/index.html').then((r) => {
-              if (r) return r;
-              // If not in cache, try to fetch it again as a last resort
-              return fetch('/index.html').catch(() => new Response('Offline', { status: 503 }));
-            });
-          }
-          return new Response('Offline', { status: 503 });
-        });
+      return fetch(request).then((res) => {
+        if (res.status === 200 && (url.pathname.match(/\.(js|css|png|svg|woff2)$/))) {
+          caches.open(CACHE_NAME).then((c) => c.put(request, res.clone()));
+        }
+        return res;
+      });
     })
   );
 });
 
-// ── Background sync for offline quiz submissions ───────────────────────────
-self.addEventListener('sync', (event) => {
-  if (event.tag === 'sync-quiz-results') {
-    event.waitUntil(syncFromIndexedDB());
-  }
+self.addEventListener('message', (event) => {
+  if (event.data?.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
-async function syncFromIndexedDB() {
-  // Notify clients to run sync via offlineDB.js
-  const clients = await self.clients.matchAll();
-  clients.forEach((client) => {
-    client.postMessage({ type: 'SYNC_QUIZZES' });
-  });
-}
-
-// ── Message handler ────────────────────────────────────────────────────────
-self.addEventListener('message', (event) => {
-  if (event.data?.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
-  if (event.data?.type === 'PRECACHE_LESSONS') {
-    // Cache lesson data sent from the app
-    const { lessons } = event.data;
-    if (lessons) {
-      caches.open(API_CACHE).then((cache) => {
-        lessons.forEach((lesson) => {
-          const url = `/api/lessons/${lesson.id}`;
-          const response = new Response(JSON.stringify({ lesson }), {
-            headers: { 'Content-Type': 'application/json' },
-          });
-          cache.put(url, response);
-        });
-      });
-    }
+self.addEventListener('sync', (event) => {
+  if (event.tag === 'sync-quiz-results') {
+    event.waitUntil(
+      self.clients.matchAll().then((clients) =>
+        clients.forEach((c) => c.postMessage({ type: 'SYNC_QUIZZES' }))
+      )
+    );
   }
 });

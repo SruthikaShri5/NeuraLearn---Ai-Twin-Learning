@@ -30,10 +30,16 @@ function LoadingScreen() {
   return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: "#FAFAFA" }}>
       <div className="text-center">
-        <div className="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-lg font-semibold text-[#1A1A2E]" style={{ fontFamily: "Space Grotesk, sans-serif" }}>
-          Loading NeuraLearn…
-        </p>
+        <div className="w-14 h-14 rounded-2xl bg-[#118AB2] flex items-center justify-center mx-auto mb-4 shadow-lg">
+          <span className="text-3xl">🧠</span>
+        </div>
+        <p className="text-lg font-bold text-[#1A1A2E] mb-1" style={{ fontFamily: "Fredoka, sans-serif" }}>NeuraLearn</p>
+        <p className="text-sm text-[#6B7280] mb-4">An app that learns how you learn</p>
+        <div className="flex items-center justify-center gap-1.5">
+          <span className="w-2 h-2 rounded-full bg-[#118AB2] animate-bounce" style={{ animationDelay: "0ms" }} />
+          <span className="w-2 h-2 rounded-full bg-[#06D6A0] animate-bounce" style={{ animationDelay: "150ms" }} />
+          <span className="w-2 h-2 rounded-full bg-[#FFD166] animate-bounce" style={{ animationDelay: "300ms" }} />
+        </div>
       </div>
     </div>
   );
@@ -64,6 +70,12 @@ function ProtectedRoute({ children, allowedRoles }) {
 function AppContent() {
   const { settings, breathingActive, gradeGroup, emotionState, setGradeGroup } = useAppStore();
   const { user } = useAuth();
+
+  // Wake up backend on app start (Render free tier cold start)
+  useEffect(() => {
+    const backendUrl = process.env.REACT_APP_BACKEND_URL || "https://neuralearn-backend.onrender.com";
+    fetch(`${backendUrl}/api/health`, { method: "GET", cache: "no-cache" }).catch(() => {});
+  }, []);
 
   // Apply grade group and disability from user
   useEffect(() => {
