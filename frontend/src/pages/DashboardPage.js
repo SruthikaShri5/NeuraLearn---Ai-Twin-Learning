@@ -410,25 +410,25 @@ export default function DashboardPage() {
         {disability && disability !== "prefer_not_to_say" && (
           <div className="mb-4 rounded-2xl px-4 py-3 border-2 flex items-center gap-3"
             style={{
-              background: disability === "visual"    ? "#0c1a2e" :
-                          disability === "hearing"   ? "#0d2b1f" :
-                          disability === "motor"     ? "#1a1200" :
-                          disability === "cognitive" ? "#1a0a2e" :
-                          disability === "speech"    ? "#0d1f2b" : "#1a1a2e",
+              background: disability === "visual"    ? "#EFF8FF" :
+                          disability === "hearing"   ? "#ECFDF5" :
+                          disability === "motor"     ? "#FFFBEB" :
+                          disability === "cognitive" ? "#F5F3FF" :
+                          disability === "speech"    ? "#FFF1F2" : "#F8FAFC",
               borderColor: disability === "visual"    ? "#118AB2" :
                            disability === "hearing"   ? "#06D6A0" :
                            disability === "motor"     ? "#FFD166" :
                            disability === "cognitive" ? "#C8B6FF" :
-                           disability === "speech"    ? "#EF476F" : "#ffffff",
+                           disability === "speech"    ? "#EF476F" : "#E2E8F0",
             }}>
             <span className="text-xl">
               {disability === "visual" ? "👁️" : disability === "hearing" ? "👂" : disability === "motor" ? "🖐️" : disability === "cognitive" ? "🧠" : disability === "speech" ? "💬" : "♿"}
             </span>
             <div>
-              <p className="font-bold text-sm capitalize" style={{ color: "#ffffff" }}>
+              <p className="font-bold text-sm capitalize text-[#1A1A2E]">
                 {disability.replace(/_/g, " ")} Mode Active
               </p>
-              <p className="text-xs" style={{ color: "rgba(255,255,255,0.6)" }}>
+              <p className="text-xs text-[#374151]">
                 {disability === "visual"    ? "Auto read-aloud on. Use R to read, voice commands enabled." :
                  disability === "hearing"   ? "Visual-only mode. No audio required. Icons guide each step." :
                  disability === "motor"     ? "Large tap targets active. Press 1-4 to answer quiz questions." :

@@ -260,28 +260,30 @@ export default function TeacherDashboardPage() {
             {/* My Classes with join code */}
             {myClasses.length > 0 && (
               <div className="neura-card p-6 mb-6">
-                <h2 className="font-bold text-[#0F172A] mb-4" style={{ fontFamily: 'Fredoka, sans-serif' }}>
-                  My Classes
-                </h2>
+                <h2 className="font-bold text-[#0F172A] mb-4" style={{ fontFamily: 'Fredoka, sans-serif' }}>My Classes</h2>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {myClasses.map((cls) => (
                     <div key={cls.id} className="rounded-xl border-2 border-[#0F172A] p-4 bg-[#f8fafc]">
                       <div className="flex items-center gap-2 mb-2">
                         <div className="w-8 h-8 rounded-lg border-2 border-[#0F172A] flex items-center justify-center font-bold text-sm"
-                          style={{ backgroundColor: GRADE_COLORS[cls.grade_level] || '#e2e8f0' }}>
-                          {(cls.grade_level || "").replace("class_", "")}
+                          style={{ backgroundColor: GRADE_COLORS[`class_${cls.grade}`] || '#e2e8f0' }}>
+                          {cls.grade || "?"}
                         </div>
-                        <p className="font-bold text-[#0F172A] truncate">{cls.name}</p>
+                        <p className="font-bold text-[#0F172A] truncate">{cls.className || cls.name || "Unnamed Class"}</p>
                       </div>
-                      <p className="text-xs text-[#64748B] mb-3">{cls.student_count || 0} students enrolled</p>
-                      <div className="flex items-center gap-2 p-2 rounded-lg bg-[#06D6A0]/10 border border-[#06D6A0]">
-                        <span className="text-xs font-semibold text-[#065f46]">Join Code:</span>
-                        <span className="font-black text-[#065f46] tracking-widest text-sm">{cls.join_code}</span>
-                        <button
-                          onClick={() => { navigator.clipboard.writeText(cls.join_code); toast.success("Join code copied!"); }}
-                          className="ml-auto text-xs font-bold px-2 py-1 rounded bg-[#06D6A0] text-white hover:bg-[#059669] transition-colors"
-                        >Copy</button>
-                      </div>
+                      <p className="text-xs text-[#64748B] mb-3">{cls.studentCount || 0} students enrolled</p>
+                      {cls.classCode ? (
+                        <div className="flex items-center gap-2 p-2 rounded-lg bg-[#06D6A0]/10 border border-[#06D6A0]">
+                          <span className="text-xs font-semibold text-[#065f46]">Join Code:</span>
+                          <span className="font-black text-[#065f46] tracking-widest text-sm flex-1">{cls.classCode}</span>
+                          <button
+                            onClick={() => { navigator.clipboard.writeText(cls.classCode); toast.success("Join code copied!"); }}
+                            className="text-xs font-bold px-2 py-1 rounded bg-[#06D6A0] text-white hover:bg-[#059669] transition-colors shrink-0"
+                          >Copy</button>
+                        </div>
+                      ) : (
+                        <p className="text-xs text-[#94a3b8] italic">No code available — try regenerating</p>
+                      )}
                     </div>
                   ))}
                 </div>
