@@ -207,7 +207,7 @@ function SubjectGroupCard({ subject, lessons, colors, headingFont, isExpanded, o
         <ChevronDown className={`w-4 h-4 text-[#374151] shrink-0 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`} />
       </button>
       {isExpanded && (
-        <div className="flex flex-col gap-2 px-4 pb-4 border-t border-[#e2e8f0] pt-3">
+        <div className="flex flex-col gap-2 px-4 pb-4 border-t border-[#e2e8f0] pt-3 max-h-64 overflow-y-auto">
           {lessons.map((lesson) => (
             <Link key={lesson.id} to={`/lesson/${lesson.id}`} data-testid={`lesson-card-${lesson.id}`}>
               <div className="p-3 rounded-xl border-2 border-[#e2e8f0] hover:border-[#118AB2] bg-[#FAFAFA] hover:bg-white flex flex-col gap-1.5 transition-all cursor-pointer">
@@ -586,6 +586,20 @@ export default function DashboardPage() {
                   <p className="text-[10px] uppercase tracking-wider mt-0.5" style={{ color: "rgba(255,255,255,0.5)" }}>{stat.label}</p>
                 </div>
               ))}
+            </div>
+            {/* Adaptation insight — makes tagline tangible */}
+            <div className="mt-3 px-3 py-2 rounded-xl text-xs" style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.6)" }}>
+              🤖 <span style={{ color: "#06D6A0", fontWeight: 700 }}>Neura is adapting:</span>{" "}
+              {(() => {
+                const lp = user.learning_profile;
+                const complexity = lp.content_complexity || "medium";
+                const style = lp.learning_style || "visual";
+                const acc = Math.round(lp.avg_quiz_accuracy || 0);
+                if (acc === 0) return "Complete your first quiz and I'll start personalising your lessons.";
+                if (complexity === "high") return `You're crushing it at ${acc}% accuracy — lessons are now at advanced level with deeper concepts.`;
+                if (complexity === "low") return `I've simplified lessons to build your confidence. Keep going, you'll level up soon!`;
+                return `Serving ${complexity} complexity ${style} lessons based on your ${acc}% quiz accuracy.`;
+              })()}
             </div>
           </div>
         )}
