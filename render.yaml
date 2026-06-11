@@ -29,13 +29,17 @@ services:
     name: neuralearn-frontend
     runtime: static
     rootDir: frontend
-    buildCommand: cd frontend && unset NODE_OPTIONS && npm install --legacy-peer-deps && npm run build
+    buildCommand: npm install --legacy-peer-deps && DISABLE_ESLINT_PLUGIN=true npx craco build
     staticPublishPath: build
     envVars:
       - key: REACT_APP_BACKEND_URL
         sync: false
       - key: NODE_OPTIONS
         value: --max-old-space-size=4096
+      - key: DISABLE_ESLINT_PLUGIN
+        value: "true"
+      - key: GENERATE_SOURCEMAP
+        value: "false"
     routes:
       - type: rewrite
         source: /*
