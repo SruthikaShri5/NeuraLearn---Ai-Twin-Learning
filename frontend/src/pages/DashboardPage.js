@@ -400,7 +400,7 @@ export default function DashboardPage() {
     <div className={dashboardContainerClass} data-testid="dashboard-page">
       {isJunior ? <JuniorNav user={user} onLogout={handleLogout} /> : <SeniorNav user={user} onLogout={handleLogout} />}
 
-      <main id="main-content" className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+      <main id="main-content" className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
 
         {/* ── Disability Mode Banner ─────────────────────────────────── */}
         {disability && disability !== "prefer_not_to_say" && (
@@ -491,39 +491,38 @@ export default function DashboardPage() {
         </div>
 
         {/* ── Stats Grid ─────────────────────────────────────────────────── */}
-        <div className="grid grid-cols-4 gap-2 mb-4" data-testid="stats-grid">
+        <div className="grid grid-cols-4 gap-3 mb-5" data-testid="stats-grid">
           {[
             { icon: Zap,    label: "XP",      value: xp,               color: "text-[#118AB2]", bg: "bg-white" },
             { icon: Flame,  label: "Streak",  value: `${streak}d`,     color: "text-[#EF476F]", bg: "bg-white" },
             { icon: Trophy, label: "Level",   value: level,            color: "text-[#b8860b]", bg: "bg-white" },
             { icon: Target, label: "Reviews", value: dueReviews.length, color: "text-[#06D6A0]", bg: "bg-white" },
           ].map((stat) => (
-            <div key={stat.label} className={`neura-card ${stat.bg} p-3 flex flex-col gap-1`}>
-              <stat.icon className={`w-4 h-4 ${stat.color}`} />
-              <p className={`text-xl font-bold ${stat.color}`} style={headingFont}>{stat.value}</p>
-              <p className="text-[10px] font-semibold text-[#64748B] uppercase tracking-wider">{stat.label}</p>
+            <div key={stat.label} className={`neura-card ${stat.bg} p-4 flex flex-col gap-1.5`}>
+              <stat.icon className={`w-5 h-5 ${stat.color}`} />
+              <p className={`text-2xl font-bold ${stat.color}`} style={headingFont}>{stat.value}</p>
+              <p className="text-xs font-semibold text-[#64748B] uppercase tracking-wider">{stat.label}</p>
             </div>
           ))}
         </div>
 
         {/* ── XP Progress ────────────────────────────────────────────────── */}
-        <div className="mb-4 rounded-2xl border border-[#1A1A2E]/20 p-4 bg-white"
+        <div className="mb-5 rounded-2xl border border-[#1A1A2E]/20 p-5 bg-white"
           style={{ boxShadow: "0 1px 6px rgba(0,0,0,0.06)" }}>
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-[#FFD166] border border-[#1A1A2E]/20 flex items-center justify-center">
-                <Zap className="w-3.5 h-3.5 text-[#1A1A2E]" />
+              <div className="w-8 h-8 rounded-lg bg-[#FFD166] border border-[#1A1A2E]/20 flex items-center justify-center">
+                <Zap className="w-4 h-4 text-[#1A1A2E]" />
               </div>
-              <span className="text-sm font-black text-[#1A1A2E]">Level {level} Progress</span>
+              <span className="text-base font-black text-[#1A1A2E]">Level {level} Progress</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="text-sm font-black text-[#118AB2]">{xp % 100}</span>
-              <span className="text-xs text-[#6B7280] font-semibold">/ 100 XP</span>
-              {xpProgress >= 80 && <span className="text-sm">🔥</span>}
+              <span className="text-base font-black text-[#118AB2]">{xp % 100}</span>
+              <span className="text-sm text-[#6B7280] font-semibold">/ 100 XP</span>
+              {xpProgress >= 80 && <span className="text-base">🔥</span>}
             </div>
           </div>
-          {/* Custom progress bar */}
-          <div className="w-full h-3 rounded-full bg-[#f1f5f9] border border-[#e2e8f0] overflow-hidden">
+          <div className="w-full h-4 rounded-full bg-[#f1f5f9] border border-[#e2e8f0] overflow-hidden">
             <div
               className="h-full rounded-full transition-all duration-700 ease-out"
               style={{
@@ -538,153 +537,161 @@ export default function DashboardPage() {
               }}
             />
           </div>
-          <div className="flex justify-between mt-1.5">
-            <span className="text-[10px] text-[#6B7280] font-semibold">Lvl {level}</span>
-            <span className="text-[10px] text-[#6B7280] font-semibold">Lvl {level + 1}</span>
+          <div className="flex justify-between mt-2">
+            <span className="text-xs text-[#6B7280] font-semibold">Lvl {level}</span>
+            <span className="text-xs text-[#6B7280] font-semibold">Lvl {level + 1}</span>
           </div>
         </div>
 
         {/* ── AI Tools Row ───────────────────────────────────────────────── */}
-        <div className="flex flex-wrap gap-2 mb-4">
+        <div className="flex flex-wrap gap-2 mb-5">
           {[
             { label: "Neura",      icon: Sparkles, active: showCompanion, onClick: () => setShowCompanion(v => !v), testid: "companion-toggle-btn" },
             { label: "AI Tutor",   icon: Bot,      active: showTutor,     onClick: () => setShowTutor(v => !v),     testid: "tutor-toggle-btn" },
             { label: "Mood Cam",   icon: Camera,   active: showEmotion,   onClick: () => setShowEmotion(v => !v),   testid: "emotion-toggle-btn" },
             { label: "Sounds",     icon: Music,    active: showSoundscape,onClick: () => setShowSoundscape(v => !v),testid: "soundscape-toggle-btn" },
             { label: "Roadmap",    icon: Map,      active: showRoadmap,   onClick: () => setShowRoadmap(v => !v),   testid: "roadmap-toggle-btn" },
-    { label: isJunior ? "Ranks" : "Leaderboard", icon: Trophy, active: false, onClick: () => setShowLeaderboard(true), testid: "leaderboard-btn" },
-    { label: isJunior ? "Badges" : "Achievements", icon: Award, active: false, onClick: () => setShowAchievements(true), testid: "achievements-btn" },
+            { label: isJunior ? "Ranks" : "Leaderboard", icon: Trophy, active: false, onClick: () => setShowLeaderboard(true), testid: "leaderboard-btn" },
+            { label: isJunior ? "Badges" : "Achievements", icon: Award, active: false, onClick: () => setShowAchievements(true), testid: "achievements-btn" },
           ].map(({ label, icon: Icon, active, onClick, testid }) => (
             <button key={label} onClick={onClick} data-testid={testid}
-              className={`inline-flex items-center gap-1.5 text-sm font-semibold h-9 px-4 rounded-full border-2 border-[#1A1A2E] transition-all ${
+              className={`inline-flex items-center gap-2 text-sm font-semibold h-10 px-4 rounded-full border-2 border-[#1A1A2E] transition-all ${
                 active ? "bg-[#1A1A2E] text-white" : "bg-white text-[#374151] hover:bg-[#f1f5f9]"
               }`}>
-              <Icon className="w-3.5 h-3.5" /> {label}
+              <Icon className="w-4 h-4" /> {label}
             </button>
           ))}
           <FocusModeToggle />
         </div>
 
-        {/* ── Learning Twin DNA Card ──────────────────────────────────── */}
-        {user?.learning_profile && (
-          <div data-testid="dna-card" className="mb-4 rounded-2xl p-4 border-2 border-[#1A1A2E]"
-            style={{ background: "#1A1A2E", boxShadow: "0 2px 12px rgba(0,0,0,0.15)" }}>
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-base">🧬</span>
-              <p className="font-bold text-sm" style={{ color: "#C8B6FF", fontFamily: "Space Grotesk, sans-serif" }}>Your Learning Twin DNA</p>
-              <span className="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: "rgba(6,214,160,0.2)", color: "#06D6A0", border: "1px solid rgba(6,214,160,0.4)" }}>LIVE · Updates after each quiz</span>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              {[
-                { label: "Style",      value: user.learning_profile.learning_style || "visual",               color: "#C8B6FF" },
-                { label: "Accuracy",  value: `${Math.round(user.learning_profile.avg_quiz_accuracy || 0)}%`, color: "#06D6A0" },
-                { label: "Complexity",value: user.learning_profile.content_complexity || "medium",            color: "#FFD166" },
-                { label: "Confidence",value: user.learning_profile.confidence_level || "medium",              color: "#118AB2" },
-              ].map(stat => (
-                <div key={stat.label} className="rounded-xl p-2 text-center" style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)" }}>
-                  <p className="font-black text-sm capitalize" style={{ color: stat.color }}>{stat.value}</p>
-                  <p className="text-[10px] uppercase tracking-wider mt-0.5" style={{ color: "rgba(255,255,255,0.5)" }}>{stat.label}</p>
+        {/* ── Two-column layout: main left, sidebar right ──────────────── */}
+        <div className="flex flex-col lg:flex-row gap-6">
+
+          {/* ── LEFT: lessons + assignments ─────────────────────────────── */}
+          <div className="flex-1 min-w-0">
+
+            {/* Spaced Review Alert */}
+            {dueReviews.length > 0 && (
+              <div className="neura-card p-4 mb-5 flex items-center gap-3 bg-[#FFD166]/10 border-[#FFD166]">
+                <RefreshCw className="w-5 h-5 text-[#b8860b] shrink-0" />
+                <div className="flex-1">
+                  <p className="font-bold text-base text-[#b8860b]">🔁 {dueReviews.length} ready for review!</p>
+                  <p className="text-sm text-[#6B7280]">{dueReviews[0]?.lesson?.title}</p>
                 </div>
-              ))}
-            </div>
-            {/* Adaptation insight — makes tagline tangible */}
-            <div className="mt-3 px-3 py-2 rounded-xl text-xs" style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.6)" }}>
-              🤖 <span style={{ color: "#06D6A0", fontWeight: 700 }}>Neura is adapting:</span>{" "}
-              {(() => {
-                const lp = user.learning_profile;
-                const complexity = lp.content_complexity || "medium";
-                const style = lp.learning_style || "visual";
-                const acc = Math.round(lp.avg_quiz_accuracy || 0);
-                if (acc === 0) return "Complete your first quiz and I'll start personalising your lessons.";
-                if (complexity === "high") return `You're excelling at ${acc}% accuracy — lessons now show advanced applications and deeper context.`;
-                if (complexity === "low") return `I've switched to step-by-step mode to build your confidence. Keep going!`;
-                if (style === "audio") return `Audio-first layout active. Lessons prioritise listen-and-learn over reading.`;
-                if (style === "interactive") return `Interactive challenges enabled. Lessons present content as hands-on experiments.`;
-                return `${style.charAt(0).toUpperCase()+style.slice(1)} learning layout at ${complexity} complexity — tuned from your ${acc}% avg accuracy.`;
-              })()}
-            </div>
-          </div>
-        )}
-
-        {/* ── Recommendations ─────────────────────────────────────────── */}
-        {recommendations.length > 0 && (
-          <div className="neura-card p-3 mb-4 bg-[#C8B6FF]/10 border-[#C8B6FF]">
-            <div className="flex items-center gap-2 mb-2">
-              <Lightbulb className="w-4 h-4 text-[#7c3aed]" />
-              <p className="font-bold text-sm text-[#7c3aed]">
-                {isJunior ? "✨ Neura suggests for you!" : "Recommended next lessons"}
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {recommendations.slice(0, 3).map(r => (
-                <Link key={r.id} to={`/lesson/${r.id}`}
-                  className="text-xs font-bold px-3 py-1.5 rounded-full border-2 bg-white border-[#C8B6FF] text-[#7c3aed] hover:shadow-sm transition-all"
-                >
-                  📚 {r.title}
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* ── Spaced Review Alert ────────────────────────────────────────── */}
-        {dueReviews.length > 0 && (
-          <div className="neura-card p-3 mb-4 flex items-center gap-3 bg-[#FFD166]/10 border-[#FFD166]">
-            <RefreshCw className="w-4 h-4 text-[#b8860b] shrink-0" />
-            <div className="flex-1">
-              <p className="font-bold text-sm text-[#b8860b]">🔁 {dueReviews.length} ready for review!</p>
-              <p className="text-xs text-[#6B7280]">{dueReviews[0]?.lesson?.title}</p>
-            </div>
-            {dueReviews[0]?.lesson_id && (
-              <Link to={`/lesson/${dueReviews[0].lesson_id}`}>
-                <button className="text-xs font-bold h-8 px-3 rounded-full bg-[#FFD166] text-[#1A1A2E] border-2 border-[#1A1A2E]">
-                  Review →
-                </button>
-              </Link>
+                {dueReviews[0]?.lesson_id && (
+                  <Link to={`/lesson/${dueReviews[0].lesson_id}`}>
+                    <button className="text-sm font-bold h-9 px-4 rounded-full bg-[#FFD166] text-[#1A1A2E] border-2 border-[#1A1A2E]">Review →</button>
+                  </Link>
+                )}
+              </div>
             )}
+
+            {/* Assignments */}
+            <AssignmentsList />
+
+            {/* Lessons Section */}
+            <div data-testid="lessons-section">
+              <h2 className="font-bold text-lg text-[#1A1A2E] mb-4" style={headingFont}>📚 Your Subjects</h2>
+              {safeLessons.length === 0 ? (
+                <div className="neura-card p-10 text-center bg-white">
+                  <BookOpen className="w-10 h-10 text-[#64748B] mx-auto mb-2" />
+                  <p className="text-base text-[#6B7280]">No lessons yet! Check back soon 🌟</p>
+                </div>
+              ) : (
+                <div className="grid sm:grid-cols-2 gap-3 items-start">
+                  {(() => {
+                    const grouped = safeLessons.reduce((acc, lesson) => {
+                      const subject = lesson.subject || "Other";
+                      if (!acc[subject]) acc[subject] = [];
+                      acc[subject].push(lesson);
+                      return acc;
+                    }, {});
+                    return Object.entries(grouped).map(([subject, subjectLessons]) => {
+                      const sc = subjectColors[subject] || { bg: "bg-[#f1f5f9]", border: "border-[#e2e8f0]", text: "text-[#374151]", label: subject };
+                      return (
+                        <SubjectGroupCard
+                          key={subject}
+                          subject={subject}
+                          lessons={subjectLessons}
+                          colors={sc}
+                          headingFont={headingFont}
+                          isExpanded={expandedSubject === subject}
+                          onToggle={(s) => setExpandedSubject((prev) => (prev === s ? null : s))}
+                        />
+                      );
+                    });
+                  })()}
+                </div>
+              )}
+            </div>
           </div>
-        )}
 
-        {/* ── Assignments ────────────────────────────────────────────────── */}
-        <AssignmentsList />
+          {/* ── RIGHT SIDEBAR ───────────────────────────────────────────── */}
+          <div className="w-full lg:w-72 xl:w-80 shrink-0 flex flex-col gap-4">
 
-        {/* ── Lessons Section ────────────────────────────────────────────── */}
-        <div data-testid="lessons-section">
-          <h2 className="font-bold text-base text-[#1A1A2E] mb-4" style={headingFont}>
-            📚 Your Subjects
-          </h2>
+            {/* Recommendations */}
+            {recommendations.length > 0 && (
+              <div className="neura-card p-4 bg-[#C8B6FF]/10 border-[#C8B6FF]">
+                <div className="flex items-center gap-2 mb-3">
+                  <Lightbulb className="w-5 h-5 text-[#7c3aed]" />
+                  <p className="font-bold text-base text-[#7c3aed]">
+                    {isJunior ? "✨ Neura suggests!" : "Recommended"}
+                  </p>
+                </div>
+                <div className="flex flex-col gap-2">
+                  {recommendations.slice(0, 3).map(r => (
+                    <Link key={r.id} to={`/lesson/${r.id}`}
+                      className="text-sm font-bold px-3 py-2 rounded-xl border-2 bg-white border-[#C8B6FF] text-[#7c3aed] hover:shadow-sm transition-all block">
+                      📚 {r.title}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
 
-          {safeLessons.length === 0 ? (
-            <div className="neura-card p-10 text-center bg-white">
-              <BookOpen className="w-10 h-10 text-[#64748B] mx-auto mb-2" />
-              <p className="text-sm text-[#6B7280]">No lessons yet! Check back soon 🌟</p>
-            </div>
-          ) : (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 items-start">
-              {(() => {
-                const grouped = safeLessons.reduce((acc, lesson) => {
-                  const subject = lesson.subject || "Other";
-                  if (!acc[subject]) acc[subject] = [];
-                  acc[subject].push(lesson);
-                  return acc;
-                }, {});
-                return Object.entries(grouped).map(([subject, subjectLessons]) => {
-                  const sc = subjectColors[subject] || { bg: "bg-[#f1f5f9]", border: "border-[#e2e8f0]", text: "text-[#374151]", label: subject };
-                  return (
-                    <SubjectGroupCard
-                      key={subject}
-                      subject={subject}
-                      lessons={subjectLessons}
-                      colors={sc}
-                      headingFont={headingFont}
-                      isExpanded={expandedSubject === subject}
-                      onToggle={(s) => setExpandedSubject((prev) => (prev === s ? null : s))}
-                    />
-                  );
-                });
-              })()}
-            </div>
-          )}
+            {/* DNA Card */}
+            {user?.learning_profile && (
+              <div data-testid="dna-card" className="neura-card p-4 border border-[#C8B6FF]/60"
+                style={{ background: "linear-gradient(135deg, #f5f0ff 0%, #eef9f6 100%)" }}>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-base">🧬</span>
+                  <p className="font-bold text-sm text-[#5b21b6]" style={{ fontFamily: "Space Grotesk, sans-serif" }}>Learning Twin DNA</p>
+                  <span className="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: "rgba(6,214,160,0.15)", color: "#047857", border: "1px solid rgba(6,214,160,0.5)" }}>LIVE</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { label: "Style",      value: user.learning_profile.learning_style || "visual",               bg: "bg-violet-50",  border: "border-violet-200",  text: "text-violet-700" },
+                    { label: "Accuracy",  value: `${Math.round(user.learning_profile.avg_quiz_accuracy || 0)}%`, bg: "bg-emerald-50", border: "border-emerald-200", text: "text-emerald-700" },
+                    { label: "Complexity",value: user.learning_profile.content_complexity || "medium",            bg: "bg-amber-50",   border: "border-amber-200",   text: "text-amber-700" },
+                    { label: "Confidence",value: user.learning_profile.confidence_level || "medium",              bg: "bg-sky-50",     border: "border-sky-200",     text: "text-sky-700" },
+                  ].map(stat => (
+                    <div key={stat.label} className={`rounded-xl p-3 text-center border ${stat.bg} ${stat.border}`}>
+                      <p className={`font-black text-sm capitalize ${stat.text}`}>{stat.value}</p>
+                      <p className="text-[10px] uppercase tracking-wider mt-0.5 text-[#6B7280]">{stat.label}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-3 px-3 py-2 rounded-xl text-xs border border-[#C8B6FF]/40" style={{ background: "rgba(200,182,255,0.12)", color: "#374151" }}>
+                  🤖 <span style={{ color: "#5b21b6", fontWeight: 700 }}>Adapting:</span>{" "}
+                  {(() => {
+                    const lp = user.learning_profile;
+                    const complexity = lp.content_complexity || "medium";
+                    const style = lp.learning_style || "visual";
+                    const acc = Math.round(lp.avg_quiz_accuracy || 0);
+                    if (acc === 0) return "Complete your first quiz to start personalising.";
+                    if (complexity === "high") return `Excelling at ${acc}% — advanced content unlocked.`;
+                    if (complexity === "low") return `Step-by-step mode active to build confidence.`;
+                    if (style === "audio") return `Audio-first layout active.`;
+                    if (style === "interactive") return `Interactive challenges enabled.`;
+                    return `${style} layout at ${complexity} complexity — from ${acc}% accuracy.`;
+                  })()}
+                </div>
+              </div>
+            )}
+
+            {/* Achievements mini */}
+            <AchievementsCard achievements={user?.achievements} isJunior={isJunior} headingFont={headingFont} />
+          </div>
         </div>
       </main>
 

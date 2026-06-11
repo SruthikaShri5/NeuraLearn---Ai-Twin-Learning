@@ -62,6 +62,7 @@ body {
   background-color: var(--bg);
   color: var(--text);
   font-family: 'Nunito', 'Inter', sans-serif;
+  font-size: 17px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -292,10 +293,10 @@ input, textarea, select {
 }
 
 /* Font Sizes — apply only to app pages, not landing/auth */
-.font-size-small { font-size: 14px; }
-.font-size-medium { font-size: 16px; }
-.font-size-large { font-size: 20px; }
-.font-size-extra-large { font-size: 24px; }
+.font-size-small { font-size: 15px; }
+.font-size-medium { font-size: 17px; }
+.font-size-large { font-size: 21px; }
+.font-size-extra-large { font-size: 26px; }
 
 /* h1/p overrides scoped to dashboard only */
 .grade-junior.font-size-small h1, .grade-senior.font-size-small h1 { font-size: 1.5rem; }
@@ -477,10 +478,10 @@ input::placeholder, textarea::placeholder { color: var(--muted) !important; }
 .reduce-motion .float-animation { animation: none; }
 
 /* ─── Font Size ─────────────────────────────────────────────────────────── */
-.font-size-small        { font-size: 14px; }
-.font-size-medium       { font-size: 16px; }
-.font-size-large        { font-size: 18px; }
-.font-size-extra-large  { font-size: 20px; }
+.font-size-small        { font-size: 15px; }
+.font-size-medium       { font-size: 17px; }
+.font-size-large        { font-size: 21px; }
+.font-size-extra-large  { font-size: 26px; }
 /* ─── Disability-adaptive body classes ──────────────────────────────────── */
 .disability-dyslexia {
   font-family: 'OpenDyslexic', 'Comic Sans MS', 'Segoe UI', sans-serif;
