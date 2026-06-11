@@ -401,6 +401,13 @@ export default function LessonPage() {
           if (disability === "visual") speak(quiz_[nextIdx]?.question || "");
         } else { submitQuiz(); }
       }
+    } else if (cmd === 'prev') {
+      if (p === 'quiz' && qIdx > 0) {
+        const quiz_ = l?.quiz || [];
+        const prevIdx = qIdx - 1;
+        setCurrentQ(prevIdx); setSelected(null);
+        if (disability === "visual") speak(quiz_[prevIdx]?.question || "");
+      }
     } else if (cmd === 'read') {
       if (p === 'learn') speak(`${l?.title}. ${l?.introduction}. ${l?.explanation}`);
       else if (p === 'quiz' && q_) speak(q_.question);
