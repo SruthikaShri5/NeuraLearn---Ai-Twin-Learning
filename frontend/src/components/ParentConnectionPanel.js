@@ -106,7 +106,7 @@ export default function ParentConnectionPanel({ connection, studentId, onConnect
         )}
       </div>
 
-      <div className={`p-5 ${isJunior ? "bg-white" : "bg-[#0D1117]"}`}>
+      <div className={`p-5 bg-white`}>
         {!connection ? (
           /* No connection yet */
           <div className="text-center py-4">

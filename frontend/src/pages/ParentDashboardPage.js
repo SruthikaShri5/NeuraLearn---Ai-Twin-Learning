@@ -200,9 +200,12 @@ export default function ParentDashboardPage() {
             <h2 className="text-xl font-bold text-[#0F172A] mb-2" style={{ fontFamily: 'Fredoka, sans-serif' }}>
               No linked children yet
             </h2>
-            <p className="text-[#64748B] max-w-md mx-auto">
-              Use the link panel above to connect your child's account with their 6-character code from their Settings page.
+            <p className="text-[#64748B] max-w-md mx-auto mb-4">
+              Use the panel above to link your child's account using their 6-character code.
             </p>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#06D6A0]/10 border border-[#06D6A0] text-sm font-semibold text-[#065f46]">
+              👀 Ask your child to open <strong>Settings → Your Parent Link Code</strong> and share the code with you
+            </div>
           </div>
         ) : (
           <div className="grid lg:grid-cols-3 gap-6">

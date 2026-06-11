@@ -68,7 +68,7 @@ export default function LinkChildPanel({ onLinked }) {
 
       <p className="text-xs text-[#94a3b8] mt-3">
         💡 Your child can find their code in{" "}
-        <strong>Settings → Learning Profile → My Link Code</strong>
+        <strong>Settings → Learning Profile → Your Parent Link Code</strong>
       </p>
     </div>
   );
