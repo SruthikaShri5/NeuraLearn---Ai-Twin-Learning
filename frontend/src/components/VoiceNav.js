@@ -147,12 +147,20 @@ export default function VoiceNav({ onCommand }) {
         }
       };
       r.onerror = (e) => {
-        setListening(false);
-        if (e.error === "not-allowed") setError("Microphone permission denied");
-        else if (e.error !== "aborted") setError("Voice error: " + e.error);
+        if (e.error === "not-allowed") { setError("Microphone permission denied"); setListening(false); }
+        else if (e.error === "no-speech") { /* silently continue */ }
+        else if (e.error !== "aborted") { setError("Voice error: " + e.error); setListening(false); }
       };
-      r.onend = () => { setListening(false); };
+      r.onend = () => {
+        // Restart if we're still meant to be listening (continuous mode drops out)
+        if (recognitionRef.current && recognitionRef._shouldListen) {
+          try { recognitionRef.current.start(); } catch (_) {}
+        } else {
+          setListening(false);
+        }
+      };
       recognitionRef.current = r;
+      recognitionRef._shouldListen = true;
       r.start();
       setListening(true);
       announce("Voice navigation active. Say a command.");
@@ -163,6 +171,7 @@ export default function VoiceNav({ onCommand }) {
   }, [supported, executeCommand, announce]);
 
   const stopListening = useCallback(() => {
+    recognitionRef._shouldListen = false;
     recognitionRef.current?.stop();
     setListening(false);
     setTranscript("");

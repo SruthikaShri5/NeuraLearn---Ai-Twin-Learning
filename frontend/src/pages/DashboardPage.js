@@ -583,10 +583,10 @@ export default function DashboardPage() {
         </div>
 
         {/* ── Two-column layout: main left, sidebar right ──────────────── */}
-        <div className="flex flex-col lg:flex-row gap-6 items-start">
+        <div className="flex flex-col lg:flex-row gap-6">
 
           {/* ── LEFT: lessons + assignments ─────────────────────────────── */}
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 flex flex-col">
 
             {/* Spaced Review Alert */}
             {dueReviews.length > 0 && (
