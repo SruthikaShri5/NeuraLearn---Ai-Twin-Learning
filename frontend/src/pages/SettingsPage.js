@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth-context";
 import { useAppStore } from "@/lib/store";
 import { useGradeTheme } from "@/lib/useGradeTheme";
@@ -13,6 +13,7 @@ import { DISABILITY_LABELS, getDisabilityProfile, applyDisabilityBodyClass } fro
 
 export default function SettingsPage() {
   const { user, updateUser } = useAuth();
+  const navigate = useNavigate();
   const { settings, updateSettings, setTourActive, setTourCompleted } = useAppStore();
   const { isJunior, isSenior, headingFont } = useGradeTheme();
   const [localSettings, setLocalSettings] = useState(null);
@@ -35,8 +36,8 @@ export default function SettingsPage() {
   const handleStartTour = () => {
     setTourCompleted(false);
     localStorage.removeItem("neuralearn_tour_done");
-    setTourActive(true);
-    toast(isJunior ? "Starting your guided tour! 🗺️" : "Launching guided tour...");
+    sessionStorage.setItem("neuralearn_launch_tour", "1");
+    navigate("/dashboard");
   };
 
   useEffect(() => {
@@ -89,7 +90,8 @@ export default function SettingsPage() {
       const { data } = await api.get("/auth/me");
       if (data.user) updateUser(data.user);
       applyDisabilityBodyClass(disabilityType);
-      toast.success("Settings saved!");
+      toast.success(isJunior ? "Settings saved! ✅" : "Settings saved successfully!");
+      setTimeout(() => navigate("/dashboard"), 1200);
     } catch {
       toast.error("Failed to save settings");
     } finally { setSaving(false); }

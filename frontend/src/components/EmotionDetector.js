@@ -140,9 +140,11 @@ export default function EmotionDetector({ onClose }) {
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        await videoRef.current.play();
+        videoRef.current.onloadedmetadata = () => {
+          videoRef.current.play();
+          setCameraActive(true);
+        };
       }
-      setCameraActive(true);
     } catch (err) {
       if (err.name === "NotAllowedError") {
         setPermissionDenied(true);

@@ -345,6 +345,19 @@ export default function LessonPage() {
 
   useEffect(() => { submitQuizRef.current = submitQuiz; }, [submitQuiz]);
 
+  // Enter key to advance quiz
+  useEffect(() => {
+    if (phase !== "quiz") return;
+    const handler = (e) => {
+      if (e.key === "Enter" && selected) {
+        e.preventDefault();
+        nextQuestion();
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [phase, selected, nextQuestion]);
+
   const handleAnswer = useCallback((qId, answer) => {
     setSelected(answer);
     setAnswers((a) => ({ ...a, [qId]: answer }));

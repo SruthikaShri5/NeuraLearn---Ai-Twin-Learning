@@ -2,14 +2,8 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppStore } from "@/lib/store";
 import { useGradeTheme } from "@/lib/useGradeTheme";
-import { Mic, MicOff, Volume2 } from "lucide-react";
+import { Mic, MicOff } from "lucide-react";
 import { getAdaptiveRate } from "@/lib/tts";
-
-/**
- * Voice-Controlled Navigation (Group C #15)
- * Commands: "next question", "hint", "focus mode", "go to dashboard",
- * "open tutor", "breathe", "read aloud", "stop reading", etc.
- */
 
 const COMMANDS = [
   { patterns: ["next question", "next", "continue"],        action: "next_question" },
@@ -18,13 +12,14 @@ const COMMANDS = [
   { patterns: ["focus mode", "focus", "concentrate"],       action: "focus_mode" },
   { patterns: ["breathe", "breathing", "calm down"],        action: "breathe" },
   { patterns: ["open tour", "start tour", "tour"],          action: "open_tour" },
+  { patterns: ["open tutor", "tutor", "ask neura"],         action: "open_tutor" },
   { patterns: ["dashboard", "go home", "home"],             action: "go_dashboard" },
   { patterns: ["read aloud", "read this", "read"],          action: "read_aloud" },
   { patterns: ["stop reading", "stop", "quiet"],            action: "stop_reading" },
   { patterns: ["knowledge graph", "graph", "map"],          action: "go_graph" },
   { patterns: ["analytics", "progress", "stats"],           action: "go_analytics" },
   { patterns: ["settings"],                                  action: "go_settings" },
-  { patterns: ["submit", "submit quiz", "done"],            action: "submit" },
+  { patterns: ["submit", "submit quiz", "done", "finish"],  action: "submit" },
 ];
 
 function matchCommand(text) {
@@ -43,10 +38,12 @@ export default function VoiceNav({ onCommand }) {
   const [lastCommand, setLastCommand] = useState(null);
   const [transcript, setTranscript] = useState("");
   const [supported, setSupported] = useState(false);
+  const [error, setError] = useState(null);
   const recognitionRef = useRef(null);
 
   useEffect(() => {
-    setSupported("webkitSpeechRecognition" in window || "SpeechRecognition" in window);
+    const isSupported = "webkitSpeechRecognition" in window || "SpeechRecognition" in window;
+    setSupported(isSupported);
   }, []);
 
   const announce = useCallback((text) => {
@@ -132,27 +129,37 @@ export default function VoiceNav({ onCommand }) {
 
   const startListening = useCallback(() => {
     if (!supported) return;
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const r = new SR();
-    r.lang = "en-IN";
-    r.continuous = true;
-    r.interimResults = true;
-    r.onresult = (e) => {
-      const result = e.results[e.results.length - 1];
-      const text = result[0].transcript;
-      setTranscript(text);
-      if (result.isFinal) {
-        const cmd = matchCommand(text);
-        if (cmd) executeCommand(cmd, text);
-        setTranscript("");
-      }
-    };
-    r.onerror = () => { setListening(false); };
-    r.onend = () => { setListening(false); };
-    recognitionRef.current = r;
-    r.start();
-    setListening(true);
-    announce("Voice navigation active. Say a command.");
+    setError(null);
+    try {
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const r = new SR();
+      r.lang = "en-US";
+      r.continuous = true;
+      r.interimResults = true;
+      r.onresult = (e) => {
+        const result = e.results[e.results.length - 1];
+        const text = result[0].transcript;
+        setTranscript(text);
+        if (result.isFinal) {
+          const cmd = matchCommand(text);
+          if (cmd) executeCommand(cmd, text);
+          setTranscript("");
+        }
+      };
+      r.onerror = (e) => {
+        setListening(false);
+        if (e.error === "not-allowed") setError("Microphone permission denied");
+        else if (e.error !== "aborted") setError("Voice error: " + e.error);
+      };
+      r.onend = () => { setListening(false); };
+      recognitionRef.current = r;
+      r.start();
+      setListening(true);
+      announce("Voice navigation active. Say a command.");
+    } catch (err) {
+      setError("Voice not supported in this browser");
+      setListening(false);
+    }
   }, [supported, executeCommand, announce]);
 
   const stopListening = useCallback(() => {
@@ -165,6 +172,13 @@ export default function VoiceNav({ onCommand }) {
 
   return (
     <div className="fixed bottom-20 right-4 z-50 flex flex-col items-center gap-2">
+      {/* Error message */}
+      {error && (
+        <div className="px-3 py-1.5 rounded-xl text-xs font-bold bg-red-100 border border-red-300 text-red-600 max-w-[180px] text-center">
+          {error}
+        </div>
+      )}
+
       {/* Transcript bubble */}
       {transcript && (
         <div className={`px-3 py-1.5 rounded-xl text-xs font-bold max-w-[180px] text-center ${
@@ -177,7 +191,7 @@ export default function VoiceNav({ onCommand }) {
       {/* Last command feedback */}
       {lastCommand && (
         <div className={`px-3 py-1.5 rounded-xl text-xs font-bold ${
-          isSenior ? "bg-emerald-900/50 border border-emerald-500/30 text-emerald-400" : "bg-[#06D6A0]/10 border-2 border-[#06D6A0] text-[#065f46]"
+          isSenior ? "bg-emerald-50 border border-emerald-500/30 text-emerald-600" : "bg-[#06D6A0]/10 border-2 border-[#06D6A0] text-[#065f46]"
         }`}>
           ✓ {lastCommand.action.replace(/_/g, " ")}
         </div>
@@ -198,8 +212,6 @@ export default function VoiceNav({ onCommand }) {
         }`}
         aria-label={listening ? "Stop voice navigation" : "Start voice navigation"}
         title={listening ? "Stop voice commands" : "Start voice commands"}
-        data-testid="voice-nav-btn"
-      >
       >
         {listening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
       </button>
