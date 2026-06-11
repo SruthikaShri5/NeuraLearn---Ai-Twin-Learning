@@ -596,9 +596,11 @@ export default function DashboardPage() {
                 const style = lp.learning_style || "visual";
                 const acc = Math.round(lp.avg_quiz_accuracy || 0);
                 if (acc === 0) return "Complete your first quiz and I'll start personalising your lessons.";
-                if (complexity === "high") return `You're crushing it at ${acc}% accuracy — lessons are now at advanced level with deeper concepts.`;
-                if (complexity === "low") return `I've simplified lessons to build your confidence. Keep going, you'll level up soon!`;
-                return `Serving ${complexity} complexity ${style} lessons based on your ${acc}% quiz accuracy.`;
+                if (complexity === "high") return `You're excelling at ${acc}% accuracy — lessons now show advanced applications and deeper context.`;
+                if (complexity === "low") return `I've switched to step-by-step mode to build your confidence. Keep going!`;
+                if (style === "audio") return `Audio-first layout active. Lessons prioritise listen-and-learn over reading.`;
+                if (style === "interactive") return `Interactive challenges enabled. Lessons present content as hands-on experiments.`;
+                return `${style.charAt(0).toUpperCase()+style.slice(1)} learning layout at ${complexity} complexity — tuned from your ${acc}% avg accuracy.`;
               })()}
             </div>
           </div>
