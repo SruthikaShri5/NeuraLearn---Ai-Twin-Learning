@@ -1205,8 +1205,20 @@ async def get_grade_lessons(user: dict = Depends(get_current_user)):
 
 # ============ AI TUTOR ============
 
+# Simple in-memory rate limit: 20 requests per user per minute
+_tutor_rate: dict = {}
+
 @api_router.post("/ai/tutor")
 async def ai_tutor(req: AITutorRequest, user: dict = Depends(get_current_user)):
+    import time
+    uid = user["_id"]
+    now = time.time()
+    window = _tutor_rate.get(uid, [])
+    window = [t for t in window if now - t < 60]
+    if len(window) >= 20:
+        raise HTTPException(status_code=429, detail="Too many requests. Please wait a moment.")
+    window.append(now)
+    _tutor_rate[uid] = window
     grade_label = (req.grade_level or "").replace("_", " ").replace("class ", "Class ").strip() or "Class 5"
     disability = req.disability_type or "prefer_not_to_say"
     profile = req.learning_profile or user.get("learning_profile", {})

@@ -251,7 +251,15 @@ export default function SignupPage() {
 
           {/* ── STEP 1: Account (all roles) ── */}
           {step === 1 && (
-            <form className="space-y-4 mt-4" onSubmit={(e) => { e.preventDefault(); setError(""); setStep(2); }} autoComplete="on">
+            <form className="space-y-4 mt-4" onSubmit={(e) => {
+              e.preventDefault();
+              if (!form.name.trim()) return setError("Please enter your name");
+              if (!form.email.trim()) return setError("Please enter your email");
+              if (form.password.length < 8) return setError("Password must be at least 8 characters");
+              if (!/[A-Z]/.test(form.password)) return setError("Password must contain an uppercase letter");
+              if (!/\d/.test(form.password)) return setError("Password must contain a digit");
+              setError(""); setStep(2);
+            }} autoComplete="on">
               <div>
                 <Label htmlFor="name" className="text-[#0F172A] font-bold mb-1.5 block">Full Name</Label>
                 <div className="relative">

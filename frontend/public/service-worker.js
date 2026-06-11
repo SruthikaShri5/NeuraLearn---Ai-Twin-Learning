@@ -1,6 +1,6 @@
 /* NeuraLearn Service Worker v2 — Full Offline Support */
-const CACHE_NAME = 'neuralearn-v5';
-const API_CACHE = 'neuralearn-api-v5';
+const CACHE_NAME = 'neuralearn-v6';
+const API_CACHE = 'neuralearn-api-v6';
 
 // Core app shell — simplified for development and production reliability
 const SHELL_ASSETS = [
@@ -47,26 +47,15 @@ self.addEventListener('fetch', (event) => {
   // Skip non-GET
   if (request.method !== 'GET') return;
 
-  // API calls: network-first, fallback to API cache
+  // API calls: network-only, never cache (contains auth tokens)
   if (url.pathname.startsWith('/api/')) {
     event.respondWith(
-      fetch(request)
-        .then((res) => {
-          if (res.ok) {
-            const clone = res.clone();
-            caches.open(API_CACHE).then((c) => c.put(request, clone));
-          }
-          return res;
-        })
-        .catch(() =>
-          caches.match(request).then((cached) => {
-            if (cached) return cached;
-            return new Response(
-              JSON.stringify({ error: 'offline', message: 'You are offline. Showing cached data.' }),
-              { headers: { 'Content-Type': 'application/json' } }
-            );
-          })
+      fetch(request).catch(() =>
+        new Response(
+          JSON.stringify({ error: 'offline', message: 'You are offline.' }),
+          { headers: { 'Content-Type': 'application/json' } }
         )
+      )
     );
     return;
   }

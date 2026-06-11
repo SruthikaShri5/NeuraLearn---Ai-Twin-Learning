@@ -26,7 +26,7 @@ async function callBackend({ message, history, lessonContext, disability, grade,
     emotion_state: emotionState || "neutral",
     history: history.slice(-6).map((m) => ({
       role: m.role === "assistant" ? "assistant" : "user",
-      content: m.text,
+      content: m.text || "",
     })),
   });
   if (res.data?.reply) return res.data.reply;

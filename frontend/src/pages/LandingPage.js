@@ -124,8 +124,6 @@ const ROLES = [
 export default function LandingPage() {
   const { user, logout, loading } = useAuth();
   const navigate = useNavigate();
-  const [scrolled, setScrolled] = useState(false);
-
   // Auto-redirect logged-in users to their dashboard
   useEffect(() => {
     if (loading || !user || user === false) return;
@@ -135,13 +133,7 @@ export default function LandingPage() {
     navigate("/dashboard", { replace: true });
   }, [user, loading, navigate]);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+
 
   const handleLogout = async () => {
     await logout();
@@ -440,7 +432,7 @@ export default function LandingPage() {
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {[
-                { icon: Brain, label: "AI Tutor", desc: "Gemini 2.5 Flash - text, voice & image input", color: "#118AB2", bg: "#EFF8FF" },
+                { icon: Brain, label: "AI Tutor", desc: "Groq llama-3.1 — instant AI responses, disability-aware prompts", color: "#118AB2", bg: "#EFF8FF" },
                 { icon: Wind, label: "Breathing Mode", desc: "4-7-8 protocol with haptic feedback", color: "#06D6A0", bg: "#F0FDF4" },
                 { icon: Mic, label: "Voice Navigation", desc: "Hands-free control with 15+ commands", color: "#8B5CF6", bg: "#F5F3FF" },
                 { icon: BarChart3, label: "Analytics", desc: "Track mastery, streaks, and learning time", color: "#F59E0B", bg: "#FFFBEB" },

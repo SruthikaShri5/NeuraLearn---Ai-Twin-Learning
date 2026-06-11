@@ -333,6 +333,14 @@ export default function LessonPage() {
       }
     } catch (err) {
       console.error("Quiz submit error:", err);
+      // Save offline if network failed
+      if (!err.response) {
+        try {
+          const { savePendingQuiz } = await import("@/lib/offlineDB");
+          await savePendingQuiz({ lesson_id: lessonId, answers, time_spent_seconds: Math.round((Date.now() - startTime) / 1000) });
+          toast("📶 Offline — quiz saved. Will sync when back online.", { duration: 5000 });
+        } catch {}
+      }
       // Still show results with a dummy score so the student isn't stuck
       const totalQs = lesson?.quiz?.length || 0;
       const correctCount = Object.values(answers).filter(
