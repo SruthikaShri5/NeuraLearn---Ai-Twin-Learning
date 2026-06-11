@@ -1,6 +1,6 @@
 /* NeuraLearn Service Worker v2 — Full Offline Support */
-const CACHE_NAME = 'neuralearn-v2';
-const API_CACHE = 'neuralearn-api-v2';
+const CACHE_NAME = 'neuralearn-v5';
+const API_CACHE = 'neuralearn-api-v5';
 
 // Core app shell — simplified for development and production reliability
 const SHELL_ASSETS = [
