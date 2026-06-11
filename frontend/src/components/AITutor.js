@@ -32,7 +32,7 @@ async function callBackend({ message, history, lessonContext, disability, grade,
         lesson_context: lessonContext || "",
         disability_type: disability,
         grade_level: grade,
-        emotion_state: emotionState,
+        emotion_state: emotionState || "neutral",
         history: history.slice(-6).map((m) => ({
           role: m.role === "assistant" ? "assistant" : "user",
           content: m.text,
@@ -40,10 +40,13 @@ async function callBackend({ message, history, lessonContext, disability, grade,
       }),
     }
   );
-  if (!res.ok) throw new Error("Backend error");
+  if (!res.ok) {
+    const errText = await res.text().catch(() => "");
+    throw new Error(`Backend error ${res.status}: ${errText}`);
+  }
   const data = await res.json();
   if (data.reply) return data.reply;
-  throw new Error("No reply");
+  throw new Error("No reply in response");
 }
 
 function getRuleBasedReply(message, isJunior, disability) {
@@ -146,7 +149,8 @@ export default function AITutor({ onClose, lessonContext = "" }) {
       });
       setMessages((m) => [...m, { role: "assistant", text: reply }]);
       if (isTTSActive) speak(reply);
-    } catch {
+    } catch (err) {
+      console.error("AI Tutor error:", err);
       const fallback = getRuleBasedReply(trimmed, isJunior, disability);
       setMessages((m) => [...m, { role: "assistant", text: fallback }]);
       if (isTTSActive) speak(fallback);

@@ -141,9 +141,14 @@ export default function EmotionDetector({ onClose }) {
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         videoRef.current.onloadedmetadata = () => {
-          videoRef.current.play();
+          videoRef.current.play().catch(() => {});
           setCameraActive(true);
         };
+        // Fallback if onloadedmetadata already fired
+        if (videoRef.current.readyState >= 1) {
+          videoRef.current.play().catch(() => {});
+          setCameraActive(true);
+        }
       }
     } catch (err) {
       if (err.name === "NotAllowedError") {
@@ -226,8 +231,10 @@ export default function EmotionDetector({ onClose }) {
             <video
               ref={videoRef}
               className="w-full h-full object-cover"
+              autoPlay
               muted
               playsInline
+              style={{ transform: "scaleX(-1)" }}
               aria-label="Camera feed for emotion detection"
             />
             {/* Hidden canvas for analysis only - not displayed */}
