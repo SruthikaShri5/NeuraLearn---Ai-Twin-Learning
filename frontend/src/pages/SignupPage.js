@@ -159,41 +159,34 @@ export default function SignupPage() {
   const cfg = ROLE_CONFIG[role];
   const totalSteps = cfg.steps.length;
 
-  // Step 0: Role selection
   if (step === 0) {
     return (
-      <div className="min-h-screen overflow-y-auto flex items-start justify-center px-6 py-8" style={{ background: "#FAFAFA", color: "#1A1A2E" }} data-testid="signup-page">
+      <div className="h-screen overflow-y-auto flex items-center justify-center px-6 py-6" style={{ background: "#FAFAFA", color: "#1A1A2E" }} data-testid="signup-page">
         <main id="main-content" className="w-full max-w-lg">
-          <Link to="/" className="flex flex-col items-center gap-1 mb-4 justify-center">
+          <Link to="/" className="flex flex-col items-center gap-0.5 mb-4 justify-center">
             <div className="flex items-center gap-2">
               <Brain className="w-7 h-7 text-[#118AB2]" strokeWidth={2.5} />
               <span className="text-xl font-bold text-[#0F172A]" style={{ fontFamily: 'Fredoka, sans-serif' }}>NeuraLearn</span>
             </div>
-            <p className="text-sm font-black text-[#118AB2] uppercase tracking-[0.2em]">An app that learns how you learn</p>
+            <p className="text-[10px] font-black text-[#118AB2] uppercase tracking-[0.2em]">An app that learns how you learn</p>
           </Link>
-          <div className="neura-card p-6">
-            <h1 className="text-xl font-bold text-[#0F172A] text-center mb-1" style={{ fontFamily: 'Fredoka, sans-serif' }}>
-              Who are you?
-            </h1>
-            <p className="text-[#64748B] text-center mb-4">Choose your role to get started</p>
+          <div className="neura-card p-5">
+            <h1 className="text-xl font-bold text-[#0F172A] text-center mb-1" style={{ fontFamily: 'Fredoka, sans-serif' }}>Who are you?</h1>
+            <p className="text-[#64748B] text-center text-sm mb-4">Choose your role to get started</p>
             <div className="space-y-3">
               {Object.entries(ROLE_CONFIG).map(([id, cfg]) => (
-                <button
-                  key={id}
-                  onClick={() => { setRole(id); setStep(1); }}
+                <button key={id} onClick={() => { setRole(id); setStep(1); }}
                   className={`w-full p-3 rounded-2xl border-2 flex items-center gap-3 transition-all hover:shadow-[4px_4px_0px_#0F172A] ${
                     role === id ? 'border-[#0F172A] shadow-[4px_4px_0px_#0F172A]' : 'border-[#e2e8f0]'
-                  }`}
-                  data-testid={`role-select-${id}`}
-                >
-                  <div className={`w-11 h-11 rounded-2xl ${cfg.color} flex items-center justify-center border-2 border-[#0F172A] shrink-0`}>
+                  }`} data-testid={`role-select-${id}`}>
+                  <div className={`w-10 h-10 rounded-xl ${cfg.color} flex items-center justify-center border-2 border-[#0F172A] shrink-0`}>
                     <cfg.icon className="w-5 h-5 text-white" />
                   </div>
                   <div className="text-left">
-                    <p className="font-bold text-[#0F172A] text-base" style={{ fontFamily: 'Fredoka, sans-serif' }}>{cfg.label}</p>
-                    <p className="text-sm text-[#64748B]">{cfg.desc}</p>
+                    <p className="font-bold text-[#0F172A]" style={{ fontFamily: 'Fredoka, sans-serif' }}>{cfg.label}</p>
+                    <p className="text-xs text-[#64748B]">{cfg.desc}</p>
                   </div>
-                  <ArrowRight className="w-5 h-5 text-[#64748B] ml-auto" />
+                  <ArrowRight className="w-4 h-4 text-[#64748B] ml-auto" />
                 </button>
               ))}
             </div>
