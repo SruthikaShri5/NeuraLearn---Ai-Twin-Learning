@@ -14,7 +14,7 @@ const QUICK_PROMPTS = {
   motor:     ["1) Explain  2) Example  3) Hint", "Summarise", "Next step", "Am I right?"],
   speech:    ["Explain this", "Show example", "Give hint", "Is this correct?"],
   junior:    ["Explain this simply 🧠", "Give me a hint 💡", "Show an example ✏️", "Why is this important? 🌟"],
-  senior:    ["Explain the concept", "Give a worked example", "What are common mistakes?", "Connect this to real life"],
+  senior:    ["Explain the concept", "Give a worked example", "What are common mistakes?", "What can you do?"],
 };
 
 async function callBackend({ message, history, lessonContext, disability, grade, emotionState }) {
