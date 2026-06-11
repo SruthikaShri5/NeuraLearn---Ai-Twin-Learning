@@ -1269,17 +1269,12 @@ General guidelines:
     reply = ""
     source = ""
 
-    for provider_name, provider_call in [
-        ("groq", _call_groq(system_prompt, req.history or [], req.message)),
-        ("gemini", _call_gemini(system_prompt, req.history or [], req.message)),
-    ]:
-        try:
-            reply, source = await provider_call
-            if reply:
-                return {"reply": reply, "source": source}
-        except Exception as e:
-            logging.warning(f"AI provider {provider_name} failed: {e}")
-            continue
+    try:
+        reply, source = await _call_groq(system_prompt, req.history or [], req.message)
+        if reply:
+            return {"reply": reply, "source": source}
+    except Exception as e:
+        logging.warning(f"Groq failed: {e}")
 
     reply = _rule_based_tutor(req.message, req.emotion_state, req.grade_level, req.disability_type)
     return {"reply": reply, "fallback": True, "error": "all_providers_failed"}
