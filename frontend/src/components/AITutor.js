@@ -67,8 +67,22 @@ function getRuleBasedReply(message, isJunior, disability) {
       ? `${p}This topic helps you understand the world! Scientists and engineers use it every day! 🌍`
       : `${p}This concept underpins more advanced topics and has direct real-world applications.`;
   }
+  if (disability === "hearing") {
+    const msg = message.toLowerCase();
+    if (msg.includes("show") || msg.includes("visual") || msg.includes("visually"))
+      return `📊 Visual Breakdown\n\n• Core idea: Every concept has a main rule or definition\n• How it works: Apply the rule step by step\n• Remember: Draw a diagram or table to organise your thinking\n\n✅ Tip: Look for keywords in the question — they tell you which concept to use.`;
+    if (msg.includes("step"))
+      return `🔢 Step-by-Step Guide\n\nStep 1 → Read the question carefully\nStep 2 → Identify the key concept\nStep 3 → Write down what you know\nStep 4 → Apply the formula or rule\nStep 5 → Check your answer\n\n✅ Take it one step at a time!`;
+    if (msg.includes("key") || msg.includes("concept"))
+      return `🗝️ Key Concepts\n\n• Definition — What the topic means\n• Formula/Rule — The main method to use\n• Example — A worked solution\n• Common mistakes — What to avoid\n\n📌 Always start by memorising the definition.`;
+    if (msg.includes("hint") || msg.includes("help") || msg.includes("stuck"))
+      return `💡 Hint\n\n• Re-read the question slowly\n• Underline the key words\n• Match those words to a concept you've studied\n• Write out what you know\n\n🔎 Still stuck? Ask me to explain a specific part.`;
+    if (msg.includes("example"))
+      return `📝 Example Walkthrough\n\n• Read the problem → Identify given values\n• Choose the right formula\n• Substitute values step by step\n• Write the final answer with units\n\n✅ Practice the same type 3 times to remember it.`;
+    return `📖 Text Explanation\n\n• Start by identifying: What is the question asking?\n• Then: Which concept from the lesson applies?\n• Finally: Apply it step by step\n\n💬 Type your specific question and I'll give a detailed visual explanation.`;
+  }
   if (disability === "visual")
-    return `${p}Good question. Here's what I think you should focus on: re-read the key concept from the lesson, then try to explain it in your own words. Would you like me to give you a verbal walkthrough?`;
+    return `${p}Good question. Re-read the key concept from the lesson, then try to explain it in your own words. Would you like me to give you a verbal walkthrough?`;
   return isJunior
     ? `${p}That's a great question! Re-read the lesson and try the examples. You're closer than you think! 💪`
     : `${p}Review the core definitions in the lesson. Break the problem into smaller parts and tackle each one.`;
@@ -76,6 +90,8 @@ function getRuleBasedReply(message, isJunior, disability) {
 
 function getWelcomeMessage(user, disability, isJunior) {
   const name = user?.name?.split(" ")[0] || "there";
+  if (disability === "hearing")
+    return `👋 Hello ${name}! I'm Neura, your visual AI tutor.\n\n📌 I'll always respond with:\n• Clear headings\n• Bullet points\n• Step-by-step breakdowns\n• No audio required\n\nWhat topic would you like to explore today?`;
   if (disability === "visual")
     return `Hello ${name}. I'm Neura, your AI tutor. I will guide you through everything. What would you like to do?\n\n1) Continue lesson\n2) Explain a concept\n3) Start quiz\n4) Ask a question`;
   if (disability === "cognitive")
