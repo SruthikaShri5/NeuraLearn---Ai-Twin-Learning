@@ -698,7 +698,7 @@ export default function DashboardPage() {
                 <div className="flex items-center gap-2 mb-3">
                   <span className="text-base">🧬</span>
                   <p className={`font-semibold text-sm ${ isSenior ? "text-[#1A1A2E]" : "font-bold text-[#5b21b6]"}`} style={headingFont}>Learning Twin DNA</p>
-                  <span className="ml-auto text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "rgba(6,214,160,0.15)", color: "#047857", border: "1px solid rgba(6,214,160,0.4)" }}>LIVE</span>
+                  <span className="ml-auto text-[10px] font-semibold px-2 py-0.5 rounded-full animate-pulse" style={{ background: "rgba(6,214,160,0.15)", color: "#047857", border: "1px solid rgba(6,214,160,0.4)" }}>● LIVE</span>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   {[
@@ -713,11 +713,11 @@ export default function DashboardPage() {
                     </div>
                   ))}
                 </div>
-                <div className={`mt-3 px-3 py-2 rounded-lg text-xs ${
+              <div className="mt-3 px-3 py-2 rounded-lg text-xs ${
                   isSenior
                     ? "bg-[#F8FAFC] border border-[#E5E7EB] text-[#374151]"
                     : "border border-[#C8B6FF]/40 text-[#374151]"
-                }`} style={isSenior ? {} : { background: "rgba(200,182,255,0.12)" }}>
+                }" style={isSenior ? {} : { background: "rgba(200,182,255,0.12)" }}>
                   🤖 <span className={`font-semibold ${ isSenior ? "text-indigo-600" : "text-[#5b21b6]"}`}>Adapting:</span>{" "}
                   {(() => {
                     const lp = user.learning_profile;

@@ -305,16 +305,24 @@ export default function LessonPage() {
           const oldProfile = user?.learning_profile || {};
           const newProfile = r.data.user?.learning_profile || {};
           updateUser(r.data.user);
-          // DNA Evolution toast
+          // DNA Evolution toast — dramatic and visible for demo
           const changes = [];
           if (Math.abs((newProfile.avg_quiz_accuracy || 0) - (oldProfile.avg_quiz_accuracy || 0)) > 2)
-            changes.push(`Accuracy → ${Math.round(newProfile.avg_quiz_accuracy || 0)}%`);
+            changes.push(`Accuracy ${Math.round(oldProfile.avg_quiz_accuracy || 0)}% → ${Math.round(newProfile.avg_quiz_accuracy || 0)}%`);
           if (newProfile.content_complexity !== oldProfile.content_complexity)
-            changes.push(`Complexity → ${newProfile.content_complexity}`);
+            changes.push(`Complexity ${oldProfile.content_complexity || 'medium'} → ${newProfile.content_complexity}`);
           if (newProfile.confidence_level !== oldProfile.confidence_level)
-            changes.push(`Confidence → ${newProfile.confidence_level}`);
-          if (changes.length > 0)
-            toast(`🧬 Learning Twin Updated: ${changes.join(" · ")}`, { duration: 5000 });
+            changes.push(`Confidence ${oldProfile.confidence_level || 'medium'} → ${newProfile.confidence_level}`);
+          if (newProfile.learning_style !== oldProfile.learning_style)
+            changes.push(`Style ${oldProfile.learning_style || 'visual'} → ${newProfile.learning_style}`);
+          if (changes.length > 0) {
+            toast(`🧬 Learning Twin Updated! ${changes.join(' · ')}`, {
+              duration: 6000,
+              description: 'Your lessons and AI Tutor will now adapt to your new profile.',
+            });
+          } else {
+            toast(`🧬 Learning Twin updated — profile refined`, { duration: 3000 });
+          }
         }
       }).catch(() => {});
       setPhase("results");

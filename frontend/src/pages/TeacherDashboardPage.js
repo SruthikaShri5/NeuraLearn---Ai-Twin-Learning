@@ -21,17 +21,106 @@ import MessageChat from "@/components/MessageChat";
 import NotificationsDropdown from "@/components/NotificationsDropdown";
 import { useClassStore } from "@/lib/classStore";
 
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/lib/auth-context";
+import api from "@/lib/api";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import {
+   Brain, LogOut, GraduationCap, Users, BookOpen, BarChart3,
+   TrendingUp, Award, Clock, ChevronRight, Search, Filter, Plus, Megaphone, FileText, CheckCircle, ChevronDown, X
+ } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import MisconceptionHeatmap from "@/components/MisconceptionHeatmap";
+import ClassroomHeatmap from "@/components/ClassroomHeatmap";
+import { toast } from "sonner";
+import CreateClassModal from "@/components/CreateClassModal";
+import CreateAssignmentModal from "@/components/CreateAssignmentModal";
+import CreateLessonModal from "@/components/CreateLessonModal";
+import StudentRosterTable from "@/components/StudentRosterTable";
+import BroadcastMessage from "@/components/BroadcastMessage";
+import MessageChat from "@/components/MessageChat";
+import NotificationsDropdown from "@/components/NotificationsDropdown";
+import { useClassStore } from "@/lib/classStore";
+
+function GradeSubmissionModal({ submission, onClose, onGraded }) {
+  const [score, setScore] = useState("");
+  const [feedback, setFeedback] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  const handleGrade = async () => {
+    const s = parseInt(score);
+    if (isNaN(s) || s < 0 || s > 100) { toast.error("Score must be 0-100"); return; }
+    setSaving(true);
+    try {
+      await api.put(`/assignments/grade/${submission.id}`, { score: s, feedback });
+      toast.success(`Graded: ${s}/100`);
+      onGraded && onGraded();
+      onClose();
+    } catch { toast.error("Failed to save grade"); }
+    finally { setSaving(false); }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={onClose}>
+      <div className="neura-card p-6 bg-white max-w-sm w-full mx-4" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-bold text-[#0F172A]" style={{ fontFamily: 'Fredoka, sans-serif' }}>Grade Submission</h3>
+          <button onClick={onClose} className="p-1 rounded hover:bg-[#f1f5f9]"><X className="w-4 h-4" /></button>
+        </div>
+        <p className="text-sm text-[#64748B] mb-4">Student: <strong>{submission.studentName}</strong></p>
+        <div className="mb-3">
+          <label className="text-sm font-bold text-[#0F172A] block mb-1">Score (0–100)</label>
+          <input type="number" min={0} max={100} value={score} onChange={e => setScore(e.target.value)}
+            className="w-full h-11 px-4 border-2 border-[#0F172A] rounded-xl text-lg font-bold text-center"
+            placeholder="85" />
+        </div>
+        <div className="mb-4">
+          <label className="text-sm font-bold text-[#0F172A] block mb-1">Feedback (optional)</label>
+          <textarea value={feedback} onChange={e => setFeedback(e.target.value)} rows={3}
+            className="w-full px-4 py-2 border-2 border-[#e2e8f0] rounded-xl text-sm resize-none"
+            placeholder="Great work on question 2!" />
+        </div>
+        <div className="flex gap-3">
+          <button onClick={onClose} className="neura-btn bg-white text-[#0F172A] flex-1 h-11">Cancel</button>
+          <button onClick={handleGrade} disabled={saving || !score} className="neura-btn bg-[#06D6A0] text-[#0F172A] flex-1 h-11 disabled:opacity-50">
+            {saving ? "Saving..." : <><CheckCircle className="w-4 h-4" /> Save Grade</>}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function AssignmentsTabContent({ classId, onNew }) {
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [expandedId, setExpandedId] = useState(null);
+  const [submissions, setSubmissions] = useState({});
+  const [loadingSubmissions, setLoadingSubmissions] = useState(false);
+  const [gradingSubmission, setGradingSubmission] = useState(null);
 
-  useEffect(() => {
+  const loadAssignments = () => {
     if (!classId) return;
     api.get(`/assignments/class/${classId}`)
       .then(r => setAssignments(r.data.assignments || []))
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [classId]);
+  };
+
+  useEffect(() => { loadAssignments(); }, [classId]); // eslint-disable-line
+
+  const toggleExpand = async (assignmentId) => {
+    if (expandedId === assignmentId) { setExpandedId(null); return; }
+    setExpandedId(assignmentId);
+    if (submissions[assignmentId]) return;
+    setLoadingSubmissions(true);
+    try {
+      const { data } = await api.get(`/assignments/submissions/${assignmentId}`);
+      setSubmissions(prev => ({ ...prev, [assignmentId]: data.submissions || [] }));
+    } catch {} finally { setLoadingSubmissions(false); }
+  };
 
   if (loading) return <div className="neura-card p-8 text-center"><div className="w-8 h-8 border-4 border-[#06D6A0] border-t-transparent rounded-full animate-spin mx-auto" /></div>;
 
@@ -46,21 +135,69 @@ function AssignmentsTabContent({ classId, onNew }) {
   return (
     <div className="space-y-3">
       {assignments.map(a => (
-        <div key={a.id} className="neura-card p-4 flex items-center gap-4">
-          <div className="w-10 h-10 rounded-xl bg-[#EF476F]/10 border-2 border-[#EF476F] flex items-center justify-center shrink-0">
-            <FileText className="w-5 h-5 text-[#EF476F]" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="font-bold text-[#0F172A] truncate">{a.title}</p>
-            <p className="text-xs text-[#64748B]">{a.description}</p>
-            <p className="text-xs text-[#94a3b8] mt-0.5">Due: {a.dueDate ? new Date(a.dueDate).toLocaleDateString() : 'No due date'}</p>
-          </div>
-          <div className="text-center shrink-0">
-            <p className="font-bold text-[#118AB2]">{a.submissionCount || 0}</p>
-            <p className="text-xs text-[#64748B]">submissions</p>
-          </div>
+        <div key={a.id} className="neura-card overflow-hidden">
+          <button className="w-full p-4 flex items-center gap-4 hover:bg-[#f8fafc] transition-colors text-left"
+            onClick={() => toggleExpand(a.id)}>
+            <div className="w-10 h-10 rounded-xl bg-[#EF476F]/10 border-2 border-[#EF476F] flex items-center justify-center shrink-0">
+              <FileText className="w-5 h-5 text-[#EF476F]" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-bold text-[#0F172A] truncate">{a.title}</p>
+              <p className="text-xs text-[#64748B]">{a.description}</p>
+              <p className="text-xs text-[#94a3b8] mt-0.5">Due: {a.dueDate ? new Date(a.dueDate).toLocaleDateString() : 'No due date'}</p>
+            </div>
+            <div className="text-center shrink-0 mr-2">
+              <p className="font-bold text-[#118AB2]">{a.submissionCount || 0}</p>
+              <p className="text-xs text-[#64748B]">submissions</p>
+            </div>
+            <ChevronDown className={`w-4 h-4 text-[#9CA3AF] transition-transform ${expandedId === a.id ? 'rotate-180' : ''}`} />
+          </button>
+
+          {expandedId === a.id && (
+            <div className="border-t border-[#e2e8f0] px-4 pb-4 pt-3">
+              <p className="text-xs font-bold text-[#64748B] mb-3 uppercase tracking-wider">Submissions</p>
+              {loadingSubmissions && !submissions[a.id] ? (
+                <div className="flex justify-center py-4"><div className="w-6 h-6 border-2 border-[#06D6A0] border-t-transparent rounded-full animate-spin" /></div>
+              ) : (submissions[a.id] || []).length === 0 ? (
+                <p className="text-sm text-[#94a3b8] text-center py-3">No submissions yet.</p>
+              ) : (
+                <div className="space-y-2">
+                  {(submissions[a.id] || []).map(sub => (
+                    <div key={sub.id} className="flex items-center gap-3 p-3 rounded-xl bg-[#f8fafc] border border-[#e2e8f0]">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-sm text-[#0F172A]">{sub.studentName}</p>
+                        <p className="text-xs text-[#64748B]">{new Date(sub.submittedAt).toLocaleDateString()}</p>
+                      </div>
+                      {sub.score !== null && sub.score !== undefined ? (
+                        <div className="text-center">
+                          <p className={`font-bold text-sm ${ sub.score >= 70 ? 'text-[#06D6A0]' : sub.score >= 50 ? 'text-[#b8860b]' : 'text-[#EF476F]'}`}>{sub.score}/100</p>
+                          <p className="text-[10px] text-[#64748B]">graded</p>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setGradingSubmission(sub)}
+                          className="text-xs font-bold px-3 py-1.5 rounded-lg bg-[#06D6A0] text-[#0F172A] border border-[#059669] hover:bg-[#059669] hover:text-white transition-colors">
+                          Grade
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       ))}
+      {gradingSubmission && (
+        <GradeSubmissionModal
+          submission={gradingSubmission}
+          onClose={() => setGradingSubmission(null)}
+          onGraded={() => {
+            setSubmissions(prev => ({ ...prev, [expandedId]: undefined }));
+            loadAssignments();
+          }}
+        />
+      )}
     </div>
   );
 }

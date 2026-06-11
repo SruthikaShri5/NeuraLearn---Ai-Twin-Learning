@@ -205,6 +205,28 @@ export default function AITutor({ onClose, lessonContext = "" }) {
         ))}
       </div>
 
+      {/* Speech disability: large tap quick-reply grid */}
+      {disability === "speech" && (
+        <div className="px-3 py-2 border-b border-[#e2e8f0] shrink-0">
+          <p className="text-[10px] font-bold text-[#64748B] mb-2 uppercase tracking-wider">Quick Reply — tap to send</p>
+          <div className="grid grid-cols-2 gap-1.5">
+            {[
+              { label: "1️⃣ Explain this", msg: "Can you explain this topic?" },
+              { label: "2️⃣ Give example", msg: "Give me a worked example" },
+              { label: "3️⃣ Show hint", msg: "Give me a hint" },
+              { label: "4️⃣ Is this right?", msg: "Am I on the right track?" },
+              { label: "5️⃣ Simpler please", msg: "Explain more simply" },
+              { label: "6️⃣ Next concept", msg: "What should I learn next?" },
+            ].map(({ label, msg }) => (
+              <button key={label} onClick={() => sendMessage(msg)}
+                className="h-10 px-2 rounded-xl border-2 border-[#118AB2]/40 bg-[#118AB2]/5 text-[#118AB2] text-xs font-bold hover:bg-[#118AB2]/15 transition-colors text-left flex items-center gap-1.5">
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-3 py-3 space-y-3">
         {messages.map((msg, i) => (
