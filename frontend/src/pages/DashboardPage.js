@@ -445,14 +445,14 @@ export default function DashboardPage() {
 
         {/* ── Welcome Card ──────────────────────────────────────────────── */}
         <div data-testid="welcome-card" className="mb-4 rounded-2xl border border-[#1A1A2E]/30 overflow-hidden"
-          style={{ boxShadow: "2px 2px 0px rgba(26,26,46,0.3)", background: isJunior
+          style={{ boxShadow: "0 1px 8px rgba(26,26,46,0.08)", background: isJunior
             ? "linear-gradient(135deg, #e0f7ff 0%, #fff9e6 50%, #e6fff5 100%)"
             : "linear-gradient(135deg, #f0f4ff 0%, #fafafa 60%, #f0fff8 100%)" }}>
           <div className="p-6 flex flex-col sm:flex-row items-center gap-5">
             {/* Avatar + glow */}
             <div className="relative shrink-0">
               <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-4xl border border-[#1A1A2E]/30"
-                style={{ background: "linear-gradient(135deg, #118AB2 0%, #06D6A0 100%)", boxShadow: "1px 1px 0 rgba(26,26,46,0.3)" }}>
+                style={{ background: "linear-gradient(135deg, #118AB2 0%, #06D6A0 100%)", boxShadow: "0 2px 8px rgba(17,138,178,0.25)" }}>
                 {AVATARS[user?.avatar] || "🦉"}
               </div>
               <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-[#06D6A0] border-2 border-white flex items-center justify-center text-[10px]">✓</span>
@@ -480,7 +480,7 @@ export default function DashboardPage() {
             {/* Breathe btn */}
             <button onClick={() => setBreathingActive(true)}
               className="shrink-0 inline-flex flex-col items-center gap-1 px-5 py-3 rounded-2xl border border-[#1A1A2E]/30 bg-white hover:bg-[#f1f5f9] font-bold text-[#1A1A2E] transition-all"
-              style={{ boxShadow: "1px 1px 0 rgba(26,26,46,0.3)" }}
+              style={{ boxShadow: "0 1px 4px rgba(26,26,46,0.08)" }}
               data-testid="breathing-btn">
               <Wind className="w-5 h-5 text-[#118AB2]" />
               <span className="text-xs">Breathe</span>
@@ -508,7 +508,7 @@ export default function DashboardPage() {
 
         {/* ── XP Progress ────────────────────────────────────────────────── */}
         <div className="mb-4 rounded-2xl border border-[#1A1A2E]/20 p-4 bg-white"
-          style={{ boxShadow: "0 1px 6px rgba(0,0,0,0.07)" }}>
+          style={{ boxShadow: "0 1px 6px rgba(0,0,0,0.06)" }}>
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <div className="w-7 h-7 rounded-lg bg-[#FFD166] border border-[#1A1A2E]/20 flex items-center justify-center">
@@ -568,7 +568,7 @@ export default function DashboardPage() {
         {/* ── Learning Twin DNA Card ──────────────────────────────────── */}
         {user?.learning_profile && (
           <div data-testid="dna-card" className="mb-4 rounded-2xl p-4 border-2 border-[#1A1A2E]"
-            style={{ background: "#1A1A2E", boxShadow: "2px 2px 0px #000" }}>
+            style={{ background: "#1A1A2E", boxShadow: "0 2px 12px rgba(0,0,0,0.15)" }}>
             <div className="flex items-center gap-2 mb-3">
               <span className="text-base">🧬</span>
               <p className="font-bold text-sm" style={{ color: "#C8B6FF", fontFamily: "Space Grotesk, sans-serif" }}>Your Learning Twin DNA</p>

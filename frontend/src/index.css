@@ -41,7 +41,7 @@ a[style*="position:fixed"][style*="bottom"][style*="right"] {
   --text2:     #374151;
   --muted:     #6B7280;
   --border:    #1A1A2E;
-  --shadow:    #1A1A2E;
+  --shadow:    rgba(26,26,46,0.18);
 
   /* Junior specifics */
   --jr-radius:     20px;
@@ -87,15 +87,15 @@ body.grade-junior h3, body.grade-junior h4 {
 
 body.grade-junior .neura-card {
   background: var(--surface);
-  border: 1.5px solid var(--border);
+  border: 1.5px solid rgba(26,26,46,0.15);
   border-radius: var(--jr-radius);
-  box-shadow: 3px 3px 0px var(--shadow);
+  box-shadow: 0 2px 8px rgba(26,26,46,0.1), 0 1px 3px rgba(26,26,46,0.07);
   transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s ease;
   color: var(--text);
 }
 body.grade-junior .neura-card:hover {
   transform: translateY(-3px) rotate(-0.2deg);
-  box-shadow: 5px 5px 0px var(--shadow);
+  box-shadow: 0 6px 18px rgba(26,26,46,0.12), 0 2px 6px rgba(26,26,46,0.08);
 }
 
 body.grade-junior .neura-btn {
@@ -171,15 +171,15 @@ body.grade-senior nav {
 /* ─── DEFAULT (no grade class — landing/login/signup) ───────────────────── */
 .neura-card {
   background: var(--surface);
-  border: 1px solid var(--border);
+  border: 1px solid rgba(26,26,46,0.1);
   border-radius: 16px;
-  box-shadow: 2px 2px 0px var(--shadow);
+  box-shadow: 0 1px 6px rgba(26,26,46,0.08), 0 1px 2px rgba(26,26,46,0.05);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
   color: var(--text);
 }
 .neura-card:hover {
   transform: translateY(-2px);
-  box-shadow: 4px 4px 0px var(--shadow);
+  box-shadow: 0 4px 14px rgba(26,26,46,0.1), 0 1px 4px rgba(26,26,46,0.07);
 }
 
 .neura-btn {
@@ -197,8 +197,8 @@ body.grade-senior nav {
   color: var(--text);
   background: transparent;
 }
-.neura-btn:hover  { transform: translateY(-1px); box-shadow: 5px 5px 0px var(--shadow); }
-.neura-btn:active { transform: translateY(2px);  box-shadow: 1px 1px 0px var(--shadow); }
+.neura-btn:hover  { transform: translateY(-1px); box-shadow: 0 3px 10px rgba(26,26,46,0.12); }
+.neura-btn:active { transform: translateY(1px);  box-shadow: none; }
 
 /* ─── FORCE LIGHT on any dark overrides ────────────────────────────────── */
 /* These override any inline dark styles that components may have hardcoded */
