@@ -234,32 +234,26 @@ export default function EmotionDetector({ onClose }) {
         </div>
       </div>
 
-      {/* ── Camera feed — large and visible ── */}
+      {/* ── Camera feed — always rendered, hidden until active ── */}
       <div className="relative w-full bg-[#0F172A]" style={{ height: "160px" }}>
-        {cameraActive ? (
-          <>
-            <video
-              ref={videoRef}
-              className="w-full h-full object-cover"
-              autoPlay
-              muted
-              playsInline
-              style={{ transform: "scaleX(-1)" }}
-              aria-label="Camera feed for emotion detection"
-            />
-            {/* Hidden canvas for analysis only - not displayed */}
-            <canvas
-              ref={canvasRef}
-              className="hidden"
-              aria-hidden="true"
-            />
-            {/* Emotion label overlay */}
-            <div className="absolute bottom-2 left-2 px-2 py-1 rounded-lg text-xs font-bold text-white" style={{ background: "rgba(0,0,0,0.5)" }}>
-              {EMOTION_EMOJIS[detectedEmotion]} {detectedEmotion}
-            </div>
-          </>
-        ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center gap-3">
+        {/* Video always in DOM so ref is available before play() */}
+        <video
+          ref={videoRef}
+          className="w-full h-full object-cover"
+          autoPlay
+          muted
+          playsInline
+          style={{ transform: "scaleX(-1)", display: cameraActive ? "block" : "none" }}
+          aria-label="Camera feed for emotion detection"
+        />
+        <canvas ref={canvasRef} className="hidden" aria-hidden="true" />
+        {cameraActive && (
+          <div className="absolute bottom-2 left-2 px-2 py-1 rounded-lg text-xs font-bold text-white" style={{ background: "rgba(0,0,0,0.5)" }}>
+            {EMOTION_EMOJIS[detectedEmotion]} {detectedEmotion}
+          </div>
+        )}
+        {!cameraActive && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
             <CameraOff className="w-10 h-10 text-white/30" />
             <p className="text-white/40 text-xs text-center px-6 leading-relaxed">
               {permissionDenied
