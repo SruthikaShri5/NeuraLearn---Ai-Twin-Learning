@@ -4,6 +4,7 @@ import { useGradeTheme } from "@/lib/useGradeTheme";
 import { useAppStore } from "@/lib/store";
 import { X, Send, Bot, Sparkles, Volume2, Trash2 } from "lucide-react";
 import { speak } from "@/lib/tts";
+import api from "@/lib/api";
 
 const QUICK_PROMPTS = {
   visual:    ["Explain this to me", "Give me an example", "What's the key idea?", "Read the summary"],
@@ -17,35 +18,18 @@ const QUICK_PROMPTS = {
 };
 
 async function callBackend({ message, history, lessonContext, disability, grade, emotionState }) {
-  const token = localStorage.getItem("access_token");
-  const res = await fetch(
-    `${process.env.REACT_APP_BACKEND_URL || "http://localhost:8000"}/api/ai/tutor`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      credentials: "include",
-      body: JSON.stringify({
-        message,
-        lesson_context: lessonContext || "",
-        disability_type: disability,
-        grade_level: grade,
-        emotion_state: emotionState || "neutral",
-        history: history.slice(-6).map((m) => ({
-          role: m.role === "assistant" ? "assistant" : "user",
-          content: m.text,
-        })),
-      }),
-    }
-  );
-  if (!res.ok) {
-    const errText = await res.text().catch(() => "");
-    throw new Error(`Backend error ${res.status}: ${errText}`);
-  }
-  const data = await res.json();
-  if (data.reply) return data.reply;
+  const res = await api.post("/ai/tutor", {
+    message,
+    lesson_context: lessonContext || "",
+    disability_type: disability,
+    grade_level: grade,
+    emotion_state: emotionState || "neutral",
+    history: history.slice(-6).map((m) => ({
+      role: m.role === "assistant" ? "assistant" : "user",
+      content: m.text,
+    })),
+  });
+  if (res.data?.reply) return res.data.reply;
   throw new Error("No reply in response");
 }
 
