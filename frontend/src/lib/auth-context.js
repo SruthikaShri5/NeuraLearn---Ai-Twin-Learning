@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback } from "react";
+import axios from "axios";
 import api, { formatApiError } from "./api";
 import { useAppStore } from "./store";
 import { applyDisabilityBodyClass } from "./disabilityProfiles";
@@ -44,7 +45,6 @@ export function AuthProvider({ children }) {
   }, []);
 
   const checkAuth = useCallback(async () => {
-    // Check token exists first — no token = not logged in, no need to hit backend
     const token = localStorage.getItem("access_token");
     if (!token) {
       setUser(false);
@@ -52,23 +52,32 @@ export function AuthProvider({ children }) {
       return;
     }
     try {
+      // Try existing token
       const { data } = await api.get("/auth/me");
       setUser(data.user);
       applyUserSettings(data.user);
-    } catch {
-      // Token expired — try silent refresh
-      try {
-        const { data: refreshData } = await api.post("/auth/refresh");
-        if (refreshData.access_token) {
-          localStorage.setItem("access_token", refreshData.access_token);
+    } catch (err) {
+      if (err.response?.status === 401) {
+        // Token expired — try one silent refresh, then give up
+        try {
+          const { data: refreshData } = await axios.post(
+            `${process.env.REACT_APP_BACKEND_URL || "https://neuralearn-backend.onrender.com"}/api/auth/refresh`,
+            {},
+            { withCredentials: true }
+          );
+          if (refreshData.access_token) {
+            localStorage.setItem("access_token", refreshData.access_token);
+            const { data } = await api.get("/auth/me");
+            setUser(data.user);
+            applyUserSettings(data.user);
+            return;
+          }
+        } catch {
+          // Refresh also failed — token is dead, clear it
         }
-        const { data } = await api.get("/auth/me");
-        setUser(data.user);
-        applyUserSettings(data.user);
-      } catch {
-        localStorage.removeItem("access_token");
-        setUser(false);
       }
+      localStorage.removeItem("access_token");
+      setUser(false);
     } finally {
       setLoading(false);
     }

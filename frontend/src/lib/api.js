@@ -20,21 +20,18 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Auto-refresh on 401 — but NOT on auth endpoints themselves
+// Auto-refresh on 401 — interceptor handles non-auth routes only
+// NOTE: /auth/me is handled manually in checkAuth, not here
 api.interceptors.response.use(
   (res) => res,
   async (error) => {
     const original = error.config;
-    const isAuthEndpoint = original.url?.includes("/auth/login") ||
-      original.url?.includes("/auth/register") ||
-      original.url?.includes("/auth/refresh") ||
-      original.url?.includes("/auth/logout");
+    const url = original.url || "";
 
-    if (
-      error.response?.status === 401 &&
-      !original._retry &&
-      !isAuthEndpoint
-    ) {
+    // Skip retry for all auth endpoints AND /auth/me (handled in checkAuth)
+    const skipRetry = url.includes("/auth/");
+
+    if (error.response?.status === 401 && !original._retry && !skipRetry) {
       original._retry = true;
       try {
         const { data } = await api.post("/auth/refresh");
@@ -44,9 +41,12 @@ api.interceptors.response.use(
         }
         return api(original);
       } catch {
-        // Refresh failed — clear token and redirect to login
         localStorage.removeItem("access_token");
-        window.location.href = "/";
+        // Only redirect if not already on a public page
+        const path = window.location.pathname;
+        if (path !== "/" && path !== "/login" && path !== "/signup") {
+          window.location.href = "/login";
+        }
       }
     }
     return Promise.reject(error);
