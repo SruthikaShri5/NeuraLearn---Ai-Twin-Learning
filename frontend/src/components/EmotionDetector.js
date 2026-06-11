@@ -176,7 +176,7 @@ export default function EmotionDetector({ onClose }) {
 
   return (
     <div
-      className="fixed top-16 right-4 w-72 z-50 rounded-2xl overflow-hidden shadow-2xl border-2 border-[#1A1A2E] bg-white"
+      className="fixed bottom-4 right-4 w-72 z-50 rounded-2xl overflow-hidden shadow-2xl border-2 border-[#1A1A2E] bg-white"
       data-testid="emotion-detector"
       role="complementary"
       aria-label="Emotion detection panel"
@@ -220,7 +220,7 @@ export default function EmotionDetector({ onClose }) {
       </div>
 
       {/* ── Camera feed — large and visible ── */}
-      <div className="relative w-full bg-[#0F172A]" style={{ height: "180px" }}>
+      <div className="relative w-full bg-[#0F172A]" style={{ height: "160px" }}>
         {cameraActive ? (
           <>
             <video
@@ -230,13 +230,16 @@ export default function EmotionDetector({ onClose }) {
               playsInline
               aria-label="Camera feed for emotion detection"
             />
-            {/* Canvas overlay for face box */}
+            {/* Hidden canvas for analysis only - not displayed */}
             <canvas
               ref={canvasRef}
-              className="absolute inset-0 w-full h-full"
-              style={{ opacity: 0.7 }}
+              className="hidden"
               aria-hidden="true"
             />
+            {/* Emotion label overlay */}
+            <div className="absolute bottom-2 left-2 px-2 py-1 rounded-lg text-xs font-bold text-white" style={{ background: "rgba(0,0,0,0.5)" }}>
+              {EMOTION_EMOJIS[detectedEmotion]} {detectedEmotion}
+            </div>
           </>
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center gap-3">

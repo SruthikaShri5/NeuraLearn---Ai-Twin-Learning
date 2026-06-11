@@ -34,7 +34,7 @@ async function callBackend({ message, history, lessonContext, disability, grade,
         grade_level: grade,
         emotion_state: emotionState,
         history: history.slice(-6).map((m) => ({
-          role: m.role === "assistant" ? "model" : "user",
+          role: m.role === "assistant" ? "assistant" : "user",
           content: m.text,
         })),
       }),
@@ -166,7 +166,7 @@ export default function AITutor({ onClose, lessonContext = "" }) {
   return (
     <div
       className="fixed bottom-4 right-4 w-80 sm:w-96 flex flex-col z-50 neura-card overflow-hidden bg-white"
-      style={{ height: "520px" }}
+      style={{ height: "min(520px, calc(100vh - 80px))", maxHeight: "calc(100vh - 80px)" }}
       role="dialog"
       aria-label="AI Tutor"
       data-testid="ai-tutor"
