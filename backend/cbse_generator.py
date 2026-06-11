@@ -559,12 +559,6 @@ TOPIC_QUIZZES = {
         {"id":"q4","question":"Which integer is neither positive nor negative?","options":["-1","0","1","2"],"correct_answer":"0"},
         {"id":"q5","question":"What is (-4) × (-3)?","options":["-12","-7","7","12"],"correct_answer":"12"},
     ],
-        {"id":"q1","question":"Which of the following is a negative integer?","options":["5","-3","0","7"],"correct_answer":"-3"},
-        {"id":"q2","question":"What is (-5) + 3?","options":["-8","-2","2","8"],"correct_answer":"-2"},
-        {"id":"q3","question":"What is the absolute value of -7?","options":["-7","0","7","14"],"correct_answer":"7"},
-        {"id":"q4","question":"Which integer is neither positive nor negative?","options":["-1","0","1","2"],"correct_answer":"0"},
-        {"id":"q5","question":"What is (-4) × (-3)?","options":["-12","-7","7","12"],"correct_answer":"12"},
-    ],
     "Algebra": [
         {"id":"q1","question":"In algebra, letters used to represent unknown values are called?","options":["Constants","Variables","Coefficients","Terms"],"correct_answer":"Variables"},
         {"id":"q2","question":"Solve: x + 5 = 10. What is x?","options":["3","4","5","6"],"correct_answer":"5"},
