@@ -1270,7 +1270,6 @@ General guidelines:
     source = ""
 
     for provider_name, provider_call in [
-        ("ollama", _call_ollama(full_prompt)),
         ("groq", _call_groq(system_prompt, req.history or [], req.message)),
         ("gemini", _call_gemini(system_prompt, req.history or [], req.message)),
     ]:
@@ -1302,20 +1301,22 @@ async def _call_groq(system_prompt: str, history: list, message: str):
     """Call Groq API (llama-3.1-8b-instant) — fast and generous free tier."""
     import httpx
     api_key = os.environ.get("GROQ_API_KEY", "")
-    if not api_key:
+    if not api_key or api_key == "your-groq-key-here":
         raise ValueError("No GROQ_API_KEY set")
 
     messages = [{"role": "system", "content": system_prompt}]
     for h in (history or [])[-6:]:
-        role = "user" if h.get("role") == "user" else "assistant"
-        messages.append({"role": role, "content": h.get("content", "")})
+        role = "user" if h.get("role") in ("user",) else "assistant"
+        content = h.get("content") or h.get("text", "")
+        if content:
+            messages.append({"role": role, "content": content})
     messages.append({"role": "user", "content": message})
 
-    async with httpx.AsyncClient(timeout=20) as client:
+    async with httpx.AsyncClient(timeout=30) as client:
         r = await client.post(
             "https://api.groq.com/openai/v1/chat/completions",
             headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
-            json={"model": "llama-3.1-8b-instant", "messages": messages, "max_tokens": 400, "temperature": 0.7}
+            json={"model": "llama-3.1-8b-instant", "messages": messages, "max_tokens": 500, "temperature": 0.7}
         )
         r.raise_for_status()
         return r.json()["choices"][0]["message"]["content"].strip(), "groq"
