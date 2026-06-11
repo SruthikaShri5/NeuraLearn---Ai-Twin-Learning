@@ -257,7 +257,7 @@ export default function DashboardPage() {
   const [showTutor, setShowTutor] = useState(false);
   const [showMoodPicker, setShowMoodPicker] = useState(false);
   const [dueReviews, setDueReviews] = useState([]);
-  const [expandedSubject, setExpandedSubject] = useState(null);
+  const [expandedSubjects, setExpandedSubjects] = useState(new Set());
   const [showRoadmap, setShowRoadmap] = useState(false);
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [showChat, setShowChat] = useState(false);
@@ -641,8 +641,12 @@ export default function DashboardPage() {
                         lessons={subjectLessons}
                         colors={sc}
                         headingFont={headingFont}
-                        isExpanded={expandedSubject === subject}
-                        onToggle={(s) => setExpandedSubject((prev) => (prev === s ? null : s))}
+                        isExpanded={expandedSubjects.has(subject)}
+                        onToggle={(s) => setExpandedSubjects(prev => {
+                          const next = new Set(prev);
+                          next.has(s) ? next.delete(s) : next.add(s);
+                          return next;
+                        })}
                         isSenior={isSenior}
                       />
                     );
