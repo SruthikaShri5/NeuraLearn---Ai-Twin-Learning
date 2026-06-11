@@ -244,10 +244,10 @@ export default function LandingPage() {
                   className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight tracking-tight"
                   style={{ fontFamily: "Fredoka, sans-serif", color: "#1A1A2E" }}
                 >
-                  Learning That{" "}
+                  An App That{" "}
                   <br />
-                  <span style={{ color: "#118AB2" }}>Adapts</span>{" to "}
-                  <span style={{ color: "#EF476F" }}>You</span>
+                  <span style={{ color: "#118AB2" }}>Learns</span>{" How You "}
+                  <span style={{ color: "#EF476F" }}>Learn</span>
                 </h1>
                 
                 <p className="text-base sm:text-lg text-[#334155] leading-relaxed max-w-2xl font-medium" style={{ fontFamily: "Nunito, sans-serif" }}>
