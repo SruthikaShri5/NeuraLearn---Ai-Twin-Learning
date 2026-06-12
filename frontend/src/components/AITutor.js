@@ -55,7 +55,6 @@ function getRuleBasedReply(message, isJunior, disability) {
       : `${p}This concept underpins more advanced topics and has direct real-world applications.`;
   }
   if (disability === "hearing") {
-    const msg = message.toLowerCase();
     if (msg.includes("show") || msg.includes("visual") || msg.includes("visually"))
       return `📊 Visual Breakdown\n\n• Core idea: Every concept has a main rule or definition\n• How it works: Apply the rule step by step\n• Remember: Draw a diagram or table to organise your thinking\n\n✅ Tip: Look for keywords in the question — they tell you which concept to use.`;
     if (msg.includes("step"))

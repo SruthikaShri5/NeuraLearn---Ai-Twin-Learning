@@ -24,7 +24,6 @@ export default function OnboardingPage() {
   const { user, updateUser } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
-  const [subStep, setSubStep] = useState(0);
   
   // Learning Profile Data
   const [profile, setProfile] = useState({
@@ -500,7 +499,7 @@ export default function OnboardingPage() {
             <p className="font-bold">Neural Twin Recommendation</p>
           </div>
           <p className="text-sm text-slate-300 leading-relaxed italic">
-            "Based on your {dna.learningStyle} strengths, I will prioritize {dna.explanationStyle} lessons with {dna.attentionSpanScore > 0.5 ? 'standard' : 'compact'} pacing to maximize your retention."
+            {`"Based on your ${dna.learningStyle} strengths, I will prioritize ${dna.explanationStyle} lessons with ${dna.attentionSpanScore > 0.5 ? 'standard' : 'compact'} pacing to maximize your retention."`}
           </p>
         </div>
 

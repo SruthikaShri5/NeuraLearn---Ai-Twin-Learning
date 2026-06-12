@@ -40,6 +40,7 @@ export default function VoiceNav({ onCommand }) {
   const [supported, setSupported] = useState(false);
   const [error, setError] = useState(null);
   const recognitionRef = useRef(null);
+  const shouldListenRef = useRef(false);
 
   useEffect(() => {
     const isSupported = "webkitSpeechRecognition" in window || "SpeechRecognition" in window;
@@ -152,15 +153,14 @@ export default function VoiceNav({ onCommand }) {
         else if (e.error !== "aborted") { setError("Voice error: " + e.error); setListening(false); }
       };
       r.onend = () => {
-        // Restart if we're still meant to be listening (continuous mode drops out)
-        if (recognitionRef.current && recognitionRef._shouldListen) {
-          try { recognitionRef.current.start(); } catch (_) {}
+        if (shouldListenRef.current) {
+          try { recognitionRef.current?.start(); } catch (_) {}
         } else {
           setListening(false);
         }
       };
       recognitionRef.current = r;
-      recognitionRef._shouldListen = true;
+      shouldListenRef.current = true;
       r.start();
       setListening(true);
       announce("Voice navigation active. Say a command.");
@@ -171,7 +171,7 @@ export default function VoiceNav({ onCommand }) {
   }, [supported, executeCommand, announce]);
 
   const stopListening = useCallback(() => {
-    recognitionRef._shouldListen = false;
+    shouldListenRef.current = false;
     recognitionRef.current?.stop();
     setListening(false);
     setTranscript("");

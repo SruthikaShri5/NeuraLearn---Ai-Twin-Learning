@@ -41,7 +41,7 @@ export default function OfflineIndicator() {
     if (isOnline && offlineQueueCount > 0) {
       handleSync();
     }
-  }, [isOnline]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isOnline, offlineQueueCount]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSync = async () => {
     setSyncing(true);
