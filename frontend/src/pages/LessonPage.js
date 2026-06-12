@@ -377,30 +377,6 @@ export default function LessonPage() {
 
   useEffect(() => { submitQuizRef.current = submitQuiz; }, [submitQuiz]);
 
-  // Enter key to advance quiz — use ref to avoid stale closure
-  const nextQuestionRef = useRef(nextQuestion);
-  useEffect(() => { nextQuestionRef.current = nextQuestion; }, [nextQuestion]);
-
-  useEffect(() => {
-    if (phase !== "quiz") return;
-    const handler = (e) => {
-      if (e.key === "Enter" && selected) {
-        e.preventDefault();
-        nextQuestionRef.current();
-      }
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [phase, selected]);
-
-  const handleAnswer = useCallback((qId, answer) => {
-    setSelected(answer);
-    setAnswers((a) => ({ ...a, [qId]: answer }));
-    vibrate('click');
-    playFeedback('click');
-    if (disability === "visual") speak(`Selected: ${answer}`);
-  }, [disability]);
-
   const nextQuestion = useCallback(() => {
     const quiz = lesson?.quiz || [];
     const nextIdx = currentQ + 1;
@@ -412,6 +388,27 @@ export default function LessonPage() {
       submitQuizRef.current && submitQuizRef.current();
     }
   }, [lesson, currentQ, answers, disability]);
+
+  // Enter key to advance quiz
+  useEffect(() => {
+    if (phase !== "quiz") return;
+    const handler = (e) => {
+      if (e.key === "Enter" && selected) {
+        e.preventDefault();
+        nextQuestion();
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [phase, selected, nextQuestion]);
+
+  const handleAnswer = useCallback((qId, answer) => {
+    setSelected(answer);
+    setAnswers((a) => ({ ...a, [qId]: answer }));
+    vibrate('click');
+    playFeedback('click');
+    if (disability === "visual") speak(`Selected: ${answer}`);
+  }, [disability]);
 
   // Use refs so voice callbacks always read latest state (no stale closure)
   const phaseRef = useRef(phase);

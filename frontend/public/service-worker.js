@@ -1,6 +1,6 @@
-/* NeuraLearn Service Worker v7 — Fixed cache strategy */
-const CACHE_NAME = 'neuralearn-v7';
-const API_CACHE = 'neuralearn-api-v7';
+/* NeuraLearn Service Worker v8 — Clone fix */
+const CACHE_NAME = 'neuralearn-v8';
+const API_CACHE = 'neuralearn-api-v8';
 
 const SHELL_ASSETS = ['/manifest.json', '/mascot.svg'];
 
@@ -63,11 +63,12 @@ self.addEventListener('fetch', (event) => {
     caches.match(request).then((cached) => {
       if (cached) return cached;
       return fetch(request).then((res) => {
-        if (res.status === 200 && (url.pathname.match(/\.(js|css|png|svg|woff2)$/))) {
-          caches.open(CACHE_NAME).then((c) => c.put(request, res.clone()));
+        if (res.ok && url.pathname.match(/\.(js|css|png|svg|woff2|woff|ttf)$/)) {
+          const cloned = res.clone();
+          caches.open(CACHE_NAME).then((c) => c.put(request, cloned));
         }
         return res;
-      });
+      }).catch(() => new Response('', { status: 503 }));
     })
   );
 });
