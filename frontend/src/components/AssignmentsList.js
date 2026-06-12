@@ -51,7 +51,7 @@ function formatDue(dateStr) {
 
 function AssignmentCard({ assignment, isJunior }) {
   const status = assignment.submission
-    ? assignment.submission.grade !== undefined
+    ? assignment.submission.score !== null && assignment.submission.score !== undefined
       ? "graded"
       : "submitted"
     : "pending";
@@ -133,9 +133,18 @@ function AssignmentCard({ assignment, isJunior }) {
                 isJunior ? "text-[#6B7280]" : "text-[#6B7280]"
               }`}
             >
-              {assignment.submission?.score !== undefined
+              {assignment.submission?.score !== null && assignment.submission?.score !== undefined
                 ? `${assignment.submission.score}/${assignment.totalPoints || assignment.maxScore} pts`
                 : `${assignment.totalPoints || assignment.maxScore} pts`}
+            </span>
+          )}
+
+          {/* Teacher feedback — shown when graded */}
+          {status === "graded" && assignment.submission?.feedback && (
+            <span className={`text-xs italic ${
+              isJunior ? "text-[#374151]" : "text-[#6B7280]"
+            }`}>
+              💬 {assignment.submission.feedback}
             </span>
           )}
 

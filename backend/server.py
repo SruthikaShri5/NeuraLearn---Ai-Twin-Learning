@@ -12,6 +12,9 @@ from bson import ObjectId
 import os
 import logging
 import bcrypt
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 import jwt
 import secrets
 import uuid
@@ -476,7 +479,10 @@ async def reset_password(req: ResetPasswordRequest):
     record = await db.password_reset_tokens.find_one({"token": req.token, "used": False})
     if not record:
         raise HTTPException(status_code=400, detail="Invalid or expired reset token")
-    if datetime.now(timezone.utc) > record["expires_at"]:
+    expires_at = record["expires_at"]
+    if expires_at.tzinfo is None:
+        expires_at = expires_at.replace(tzinfo=timezone.utc)
+    if datetime.now(timezone.utc) > expires_at:
         raise HTTPException(status_code=400, detail="Reset token expired")
     if len(req.new_password) < 8:
         raise HTTPException(status_code=400, detail="Password must be at least 8 characters")
@@ -489,7 +495,17 @@ async def reset_password(req: ResetPasswordRequest):
 
 @api_router.put("/user/profile")
 async def update_profile(req: UpdateProfileRequest, user: dict = Depends(get_current_user)):
-    updates = {k: v for k, v in req.model_dump().items() if v is not None}
+    raw = req.model_dump()
+    updates = {}
+    for k, v in raw.items():
+        if v is None:
+            continue
+        if k == "learning_profile" and isinstance(v, dict):
+            # Merge learning_profile fields individually to avoid overwriting
+            for pk, pv in v.items():
+                updates[f"learning_profile.{pk}"] = pv
+        else:
+            updates[k] = v
     if updates:
         updates["updated_at"] = datetime.now(timezone.utc).isoformat()
         await db.users.update_one({"_id": ObjectId(user["_id"])}, {"$set": updates})
@@ -1206,6 +1222,7 @@ async def get_grade_lessons(user: dict = Depends(get_current_user)):
 # ============ AI TUTOR ============
 
 # Simple in-memory rate limit: 20 requests per user per minute
+# Entries are cleaned up on each request to prevent unbounded growth
 _tutor_rate: dict = {}
 
 @api_router.post("/ai/tutor")
@@ -1219,6 +1236,12 @@ async def ai_tutor(req: AITutorRequest, user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=429, detail="Too many requests. Please wait a moment.")
     window.append(now)
     _tutor_rate[uid] = window
+    # Purge stale entries for users inactive > 5 minutes to prevent memory leak
+    if len(_tutor_rate) > 500:
+        cutoff = now - 300
+        stale = [k for k, v in _tutor_rate.items() if not v or max(v) < cutoff]
+        for k in stale:
+            del _tutor_rate[k]
     grade_label = (req.grade_level or "").replace("_", " ").replace("class ", "Class ").strip() or "Class 5"
     disability = req.disability_type or "prefer_not_to_say"
     profile = req.learning_profile or user.get("learning_profile", {})
@@ -1466,12 +1489,113 @@ async def focus_complete(user: dict = Depends(get_current_user)):
 
 
 
-async def root():
+@app.get("/")
+async def root_get():
     return {"message": "NeuraLearn API v1"}
 
 @api_router.get("/health")
 async def health():
     return {"status": "healthy"}
+
+@api_router.post("/admin/seed-demo-data")
+async def seed_demo_data(user: dict = Depends(get_current_user)):
+    """Seed a demo student enrolled in the first teacher class — for judge demos."""
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin only")
+
+    # Find any teacher
+    teacher = await db.users.find_one({"role": "teacher"})
+    if not teacher:
+        raise HTTPException(status_code=404, detail="No teacher found. Create a teacher account first.")
+    teacher_id = str(teacher["_id"])
+
+    # Find or create demo class
+    demo_class = await db.classes.find_one({"teacherId": teacher_id})
+    if not demo_class:
+        code = secrets.token_urlsafe(6).upper()[:8]
+        res = await db.classes.insert_one({
+            "className": "Demo Class", "section": "A", "grade": 8,
+            "subject": "Math & Science", "academicYear": "2024-2025",
+            "teacherId": teacher_id, "teacherName": teacher.get("name", ""),
+            "teacherEmail": teacher.get("email", ""),
+            "classCode": code, "studentCount": 0, "createdAt": datetime.now(timezone.utc).isoformat(), "settings": {},
+        })
+        demo_class = await db.classes.find_one({"_id": res.inserted_id})
+    class_id = str(demo_class["_id"])
+
+    DEMO_STUDENTS = [
+        {"name": "Arjun Sharma",   "email": "demo.arjun@neuralearn.com",   "avatar": "fox",     "grade": "class_8", "disability": "dyslexia",   "xp": 340, "streak": 5},
+        {"name": "Priya Nair",     "email": "demo.priya@neuralearn.com",   "avatar": "bunny",   "grade": "class_8", "disability": "visual",    "xp": 210, "streak": 3},
+        {"name": "Rahul Gupta",    "email": "demo.rahul@neuralearn.com",   "avatar": "bear",    "grade": "class_8", "disability": "motor",     "xp": 120, "streak": 0},
+        {"name": "Sneha Iyer",     "email": "demo.sneha@neuralearn.com",   "avatar": "cat",     "grade": "class_8", "disability": "cognitive", "xp": 460, "streak": 7},
+        {"name": "Vikram Reddy",   "email": "demo.vikram@neuralearn.com",  "avatar": "dragon",  "grade": "class_8", "disability": "hearing",   "xp": 80,  "streak": 1},
+    ]
+
+    created = 0
+    for s in DEMO_STUDENTS:
+        existing = await db.users.find_one({"email": s["email"]})
+        if existing:
+            student_id = str(existing["_id"])
+        else:
+            auto = get_automatic_disability_settings(s["disability"])
+            child_code = secrets.token_urlsafe(4).upper()[:6]
+            doc = {
+                "name": s["name"], "email": s["email"],
+                "password_hash": hash_password("Demo123!"),
+                "role": "student", "avatar": s["avatar"],
+                "disability_type": s["disability"], "grade_level": s["grade"],
+                "learning_style": auto.get("learning_style", "visual"),
+                "child_code": child_code, "parent_ids": [],
+                "onboarding_complete": True,
+                "xp": s["xp"], "level": max(1, s["xp"] // 100 + 1), "streak": s["streak"],
+                "last_active": (datetime.now(timezone.utc) - timedelta(hours=s["streak"] * 3)).isoformat(),
+                "achievements": ["first_lesson"] + (["streak_3"] if s["streak"] >= 3 else []),
+                "daily_goal_minutes": 30, "subjects": [],
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "settings": {"high_contrast": auto.get("high_contrast", False), "font_size": "medium", "reduce_motion": False, "haptic_intensity": "medium", "soundscape_volume": 50, "input_channels": {"voice": auto.get("voice_nav_enabled", False), "keyboard": True, "text": True}, "federated_sharing": True},
+                "learning_profile": {
+                    "learning_style": auto.get("learning_style", "visual"),
+                    "explanation_style": "conceptual", "avg_quiz_accuracy": min(90, 40 + s["xp"] // 10),
+                    "hint_usage_rate": 0.2, "confidence_level": "medium",
+                    "content_complexity": "high" if s["xp"] > 300 else "medium",
+                    "attention_span_score": 0.7, "engagement_score": 0.6,
+                    "strong_subjects": ["mathematics"], "weak_subjects": [],
+                    "tts_active": auto.get("tts_enabled", False),
+                    "dyslexia_font_active": auto.get("dyslexia_font", False),
+                    "large_targets_active": auto.get("large_touch_targets", False),
+                    "captions_active": auto.get("captions_enabled", False),
+                },
+            }
+            res = await db.users.insert_one(doc)
+            student_id = str(res.inserted_id)
+            created += 1
+
+        # Enroll in class if not already
+        existing_enroll = await db.enrollments.find_one({"studentId": student_id, "classId": class_id, "status": "active"})
+        if not existing_enroll:
+            await db.enrollments.insert_one({
+                "studentId": student_id, "studentName": s["name"], "studentEmail": s["email"],
+                "classId": class_id, "teacherId": teacher_id, "status": "active",
+                "joinedAt": datetime.now(timezone.utc).isoformat(),
+            })
+            await db.classes.update_one({"_id": demo_class["_id"]}, {"$inc": {"studentCount": 1}})
+
+        # Seed 3 quiz sessions per student
+        for i in range(3):
+            lesson = await db.lessons.find_one({"grade": s["grade"]})
+            if lesson:
+                existing_sess = await db.sessions.find_one({"user_id": student_id, "lesson_id": lesson["id"]})
+                if not existing_sess:
+                    score = max(20, min(100, s["xp"] // 4 + (i * 10)))
+                    await db.sessions.insert_one({
+                        "id": str(uuid.uuid4()), "user_id": student_id,
+                        "lesson_id": lesson["id"], "score": score, "correct": score // 25, "total": 4,
+                        "xp_gained": score // 10, "time_spent_seconds": 180 + i * 60,
+                        "completed_at": (datetime.now(timezone.utc) - timedelta(days=i)).isoformat()
+                    })
+
+    return {"message": f"Demo data seeded. {created} new students created. Class: {demo_class.get('classCode', 'N/A')}"}
+
 
 @api_router.post("/admin/reseed-lessons")
 async def reseed_lessons(user: dict = Depends(get_current_user)):
@@ -1543,13 +1667,104 @@ async def startup():
     await seed_concepts()
     await seed_lessons()
 
+    # Auto seed demo students if no students exist yet
+    student_count = await db.users.count_documents({"role": "student"})
+    if student_count == 0:
+        try:
+            await _auto_seed_demo_students()
+        except Exception as e:
+            logging.warning(f"Demo student seed skipped: {e}")
+
+
+async def _auto_seed_demo_students():
+    """Idempotent: seeds demo students only if none exist."""
+    teacher = await db.users.find_one({"role": "teacher"})
+    if not teacher:
+        return  # No teacher yet, skip
+    teacher_id = str(teacher["_id"])
+    demo_class = await db.classes.find_one({"teacherId": teacher_id})
+    if not demo_class:
+        code = secrets.token_urlsafe(6).upper()[:8]
+        res = await db.classes.insert_one({
+            "className": "Demo Class", "section": "A", "grade": 8,
+            "subject": "Math & Science", "academicYear": "2024-2025",
+            "teacherId": teacher_id, "teacherName": teacher.get("name", ""),
+            "teacherEmail": teacher.get("email", ""),
+            "classCode": code, "studentCount": 0,
+            "createdAt": datetime.now(timezone.utc).isoformat(), "settings": {},
+        })
+        demo_class = await db.classes.find_one({"_id": res.inserted_id})
+    class_id = str(demo_class["_id"])
+    DEMO_STUDENTS = [
+        {"name": "Arjun Sharma",  "email": "demo.arjun@neuralearn.com",  "avatar": "fox",    "grade": "class_8", "disability": "dyslexia",   "xp": 340, "streak": 5},
+        {"name": "Priya Nair",    "email": "demo.priya@neuralearn.com",  "avatar": "bunny",  "grade": "class_8", "disability": "visual",    "xp": 210, "streak": 3},
+        {"name": "Rahul Gupta",   "email": "demo.rahul@neuralearn.com",  "avatar": "bear",   "grade": "class_8", "disability": "motor",     "xp": 120, "streak": 0},
+        {"name": "Sneha Iyer",    "email": "demo.sneha@neuralearn.com",  "avatar": "cat",    "grade": "class_8", "disability": "cognitive", "xp": 460, "streak": 7},
+        {"name": "Vikram Reddy",  "email": "demo.vikram@neuralearn.com", "avatar": "dragon", "grade": "class_8", "disability": "hearing",   "xp": 80,  "streak": 1},
+    ]
+    for s in DEMO_STUDENTS:
+        existing = await db.users.find_one({"email": s["email"]})
+        if existing:
+            student_id = str(existing["_id"])
+        else:
+            auto = get_automatic_disability_settings(s["disability"])
+            doc = {
+                "name": s["name"], "email": s["email"],
+                "password_hash": hash_password("Demo123!"),
+                "role": "student", "avatar": s["avatar"],
+                "disability_type": s["disability"], "grade_level": s["grade"],
+                "learning_style": auto.get("learning_style", "visual"),
+                "child_code": secrets.token_urlsafe(4).upper()[:6], "parent_ids": [],
+                "onboarding_complete": True,
+                "xp": s["xp"], "level": max(1, s["xp"] // 100 + 1), "streak": s["streak"],
+                "last_active": (datetime.now(timezone.utc) - timedelta(hours=max(0, 6 - s["streak"]))).isoformat(),
+                "achievements": ["first_lesson"] + (["streak_3"] if s["streak"] >= 3 else []),
+                "daily_goal_minutes": 30, "subjects": [],
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "settings": {"high_contrast": auto.get("high_contrast", False), "font_size": "medium", "reduce_motion": False, "haptic_intensity": "medium", "soundscape_volume": 50, "input_channels": {"voice": auto.get("voice_nav_enabled", False), "keyboard": True, "text": True}, "federated_sharing": True},
+                "learning_profile": {
+                    "learning_style": auto.get("learning_style", "visual"), "explanation_style": "conceptual",
+                    "avg_quiz_accuracy": min(90, 40 + s["xp"] // 10), "hint_usage_rate": 0.2,
+                    "confidence_level": "medium", "content_complexity": "high" if s["xp"] > 300 else "medium",
+                    "attention_span_score": 0.7, "engagement_score": 0.6,
+                    "strong_subjects": ["mathematics"], "weak_subjects": [],
+                    "tts_active": auto.get("tts_enabled", False),
+                    "dyslexia_font_active": auto.get("dyslexia_font", False),
+                    "large_targets_active": auto.get("large_touch_targets", False),
+                    "captions_active": auto.get("captions_enabled", False),
+                },
+            }
+            res = await db.users.insert_one(doc)
+            student_id = str(res.inserted_id)
+        existing_enroll = await db.enrollments.find_one({"studentId": student_id, "classId": class_id, "status": "active"})
+        if not existing_enroll:
+            await db.enrollments.insert_one({
+                "studentId": student_id, "studentName": s["name"], "studentEmail": s["email"],
+                "classId": class_id, "teacherId": teacher_id, "status": "active",
+                "joinedAt": datetime.now(timezone.utc).isoformat(),
+            })
+            await db.classes.update_one({"_id": demo_class["_id"]}, {"$inc": {"studentCount": 1}})
+        # Seed sessions
+        for i in range(3):
+            lesson = await db.lessons.find_one({"grade": s["grade"]})
+            if lesson:
+                existing_sess = await db.sessions.find_one({"user_id": student_id, "lesson_id": lesson["id"]})
+                if not existing_sess:
+                    score = max(20, min(100, s["xp"] // 4 + i * 10))
+                    await db.sessions.insert_one({
+                        "id": str(uuid.uuid4()), "user_id": student_id, "lesson_id": lesson["id"],
+                        "score": score, "correct": score // 25, "total": 4,
+                        "xp_gained": score // 10, "time_spent_seconds": 180 + i * 60,
+                        "completed_at": (datetime.now(timezone.utc) - timedelta(days=i)).isoformat()
+                    })
+    logging.info("Demo student seed complete.")
+
 app.include_router(api_router)
 
 from connections_router import get_connections_router
 app.include_router(get_connections_router(db, get_current_user))
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
+
 
 @app.on_event("shutdown")
 async def shutdown_db_client():

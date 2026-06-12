@@ -318,8 +318,8 @@ export default function EmotionDetector({ onClose }) {
 
         <p className="text-[10px] text-[#94a3b8] text-center pb-2">
           {cameraActive
-            ? "Analysing facial expressions in real-time"
-            : "Simulated detection — allow camera for real analysis"}
+            ? "Analysing brightness & motion patterns (heuristic PoC)"
+            : "Simulated detection — allow camera for heuristic analysis"}
         </p>
       </div>
     </div>

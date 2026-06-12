@@ -5,29 +5,6 @@ import api from "@/lib/api";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import {
    Brain, LogOut, GraduationCap, Users, BookOpen, BarChart3,
-   TrendingUp, Award, Clock, ChevronRight, Search, Filter, Plus, Megaphone, FileText
- } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import MisconceptionHeatmap from "@/components/MisconceptionHeatmap";
-import ClassroomHeatmap from "@/components/ClassroomHeatmap";
-import { toast } from "sonner";
-import CreateClassModal from "@/components/CreateClassModal";
-import CreateAssignmentModal from "@/components/CreateAssignmentModal";
-import CreateLessonModal from "@/components/CreateLessonModal";
-import StudentRosterTable from "@/components/StudentRosterTable";
-import BroadcastMessage from "@/components/BroadcastMessage";
-import MessageChat from "@/components/MessageChat";
-import NotificationsDropdown from "@/components/NotificationsDropdown";
-import { useClassStore } from "@/lib/classStore";
-
-import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "@/lib/auth-context";
-import api from "@/lib/api";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
-import {
-   Brain, LogOut, GraduationCap, Users, BookOpen, BarChart3,
    TrendingUp, Award, Clock, ChevronRight, Search, Filter, Plus, Megaphone, FileText, CheckCircle, ChevronDown, X
  } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -52,6 +29,7 @@ function GradeSubmissionModal({ submission, onClose, onGraded }) {
   const handleGrade = async () => {
     const s = parseInt(score);
     if (isNaN(s) || s < 0 || s > 100) { toast.error("Score must be 0-100"); return; }
+    if (!submission.id) { toast.error("Submission ID missing — try refreshing."); return; }
     setSaving(true);
     try {
       await api.put(`/assignments/grade/${submission.id}`, { score: s, feedback });
@@ -101,6 +79,13 @@ function AssignmentsTabContent({ classId, onNew }) {
   const [loadingSubmissions, setLoadingSubmissions] = useState(false);
   const [gradingSubmission, setGradingSubmission] = useState(null);
 
+  // Normalize submission so .id is always present
+  const normalizeSubmission = (sub) => ({
+    ...sub,
+    id: sub.id || sub._id || "",
+    studentName: sub.studentName || sub.student_name || "Student",
+  });
+
   const loadAssignments = () => {
     if (!classId) return;
     api.get(`/assignments/class/${classId}`)
@@ -118,7 +103,7 @@ function AssignmentsTabContent({ classId, onNew }) {
     setLoadingSubmissions(true);
     try {
       const { data } = await api.get(`/assignments/submissions/${assignmentId}`);
-      setSubmissions(prev => ({ ...prev, [assignmentId]: data.submissions || [] }));
+      setSubmissions(prev => ({ ...prev, [assignmentId]: (data.submissions || []).map(normalizeSubmission) }));
     } catch {} finally { setLoadingSubmissions(false); }
   };
 
@@ -169,13 +154,25 @@ function AssignmentsTabContent({ classId, onNew }) {
                         <p className="text-xs text-[#64748B]">{new Date(sub.submittedAt).toLocaleDateString()}</p>
                       </div>
                       {sub.score !== null && sub.score !== undefined ? (
-                        <div className="text-center">
-                          <p className={`font-bold text-sm ${ sub.score >= 70 ? 'text-[#06D6A0]' : sub.score >= 50 ? 'text-[#b8860b]' : 'text-[#EF476F]'}`}>{sub.score}/100</p>
-                          <p className="text-[10px] text-[#64748B]">graded</p>
+                        <div className="text-center shrink-0">
+                          <p className={`font-bold text-sm ${ sub.score >= 70 ? 'text-[#06D6A0]' : sub.score >= 50 ? 'text-[#b8860b]' : 'text-[#EF476F]'}`}>
+                            {sub.score}/100
+                          </p>
+                          <div className="w-16 h-1.5 rounded-full bg-[#e2e8f0] mt-1 overflow-hidden">
+                            <div className="h-full rounded-full transition-all" style={{
+                              width: `${sub.score}%`,
+                              background: sub.score >= 70 ? '#06D6A0' : sub.score >= 50 ? '#FFD166' : '#EF476F'
+                            }} />
+                          </div>
+                          {sub.feedback && (
+                            <p className="text-[10px] text-[#64748B] mt-0.5 max-w-[80px] truncate" title={sub.feedback}>
+                              💬 {sub.feedback}
+                            </p>
+                          )}
                         </div>
                       ) : (
                         <button
-                          onClick={() => setGradingSubmission(sub)}
+                          onClick={() => setGradingSubmission(normalizeSubmission(sub))}
                           className="text-xs font-bold px-3 py-1.5 rounded-lg bg-[#06D6A0] text-[#0F172A] border border-[#059669] hover:bg-[#059669] hover:text-white transition-colors">
                           Grade
                         </button>
@@ -193,7 +190,13 @@ function AssignmentsTabContent({ classId, onNew }) {
           submission={gradingSubmission}
           onClose={() => setGradingSubmission(null)}
           onGraded={() => {
+            // Refetch submissions for the expanded assignment
             setSubmissions(prev => ({ ...prev, [expandedId]: undefined }));
+            if (expandedId) {
+              api.get(`/assignments/submissions/${expandedId}`)
+                .then(r => setSubmissions(prev => ({ ...prev, [expandedId]: (r.data.submissions || []).map(normalizeSubmission) })))
+                .catch(() => {});
+            }
             loadAssignments();
           }}
         />

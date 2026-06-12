@@ -713,11 +713,11 @@ export default function DashboardPage() {
                     </div>
                   ))}
                 </div>
-              <div className="mt-3 px-3 py-2 rounded-lg text-xs ${
+              <div className={`mt-3 px-3 py-2 rounded-lg text-xs ${
                   isSenior
                     ? "bg-[#F8FAFC] border border-[#E5E7EB] text-[#374151]"
                     : "border border-[#C8B6FF]/40 text-[#374151]"
-                }" style={isSenior ? {} : { background: "rgba(200,182,255,0.12)" }}>
+                }`} style={isSenior ? {} : { background: "rgba(200,182,255,0.12)" }}>
                   🤖 <span className={`font-semibold ${ isSenior ? "text-indigo-600" : "text-[#5b21b6]"}`}>Adapting:</span>{" "}
                   {(() => {
                     const lp = user.learning_profile;

@@ -281,9 +281,9 @@ export default function ParentDashboardPage() {
                     </h3>
                     <span className="text-sm font-bold text-[#118AB2]">{selectedChild.xp || 0} / {(selectedChild.level || 1) * 100} XP</span>
                   </div>
-                  <Progress value={Math.min(((selectedChild.xp || 0) % 100), 100)} className="h-3" />
+                  <Progress value={Math.min((selectedChild.xp || 0) % 100, 100)} className="h-3" />
                   <p className="text-xs text-[#64748B] mt-2">
-                    {Math.max(0, (selectedChild.level || 1) * 100 - (selectedChild.xp || 0))} XP to next level
+                    {100 - (selectedChild.xp || 0) % 100} XP to next level
                   </p>
                 </div>
 

@@ -361,18 +361,21 @@ export default function LessonPage() {
 
   useEffect(() => { submitQuizRef.current = submitQuiz; }, [submitQuiz]);
 
-  // Enter key to advance quiz
+  // Enter key to advance quiz — use ref to avoid stale closure
+  const nextQuestionRef = useRef(nextQuestion);
+  useEffect(() => { nextQuestionRef.current = nextQuestion; }, [nextQuestion]);
+
   useEffect(() => {
     if (phase !== "quiz") return;
     const handler = (e) => {
       if (e.key === "Enter" && selected) {
         e.preventDefault();
-        nextQuestion();
+        nextQuestionRef.current();
       }
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [phase, selected, nextQuestion]);
+  }, [phase, selected]);
 
   const handleAnswer = useCallback((qId, answer) => {
     setSelected(answer);
@@ -508,6 +511,22 @@ export default function LessonPage() {
                 <ReadAloudBtn text={`${lesson.title}. ${lesson.introduction}. ${lesson.explanation}`} label="Read lesson" />
               )}
             </div>
+
+            {/* Learning DNA personalisation badge */}
+            {dna.learning_style && dna.content_complexity && (
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-xs font-bold px-3 py-1 rounded-full bg-[#C8B6FF]/20 border border-[#C8B6FF] text-[#7c3aed]">
+                  🧬 Personalised for your learning style: {dna.learning_style}
+                </span>
+                <span className={`text-xs font-bold px-3 py-1 rounded-full border ${
+                  dna.content_complexity === 'high' ? 'bg-[#06D6A0]/10 border-[#06D6A0] text-[#065f46]' :
+                  dna.content_complexity === 'low'  ? 'bg-[#FFD166]/10 border-[#FFD166] text-[#b8860b]' :
+                  'bg-[#118AB2]/10 border-[#118AB2] text-[#118AB2]'
+                }`}>
+                  {dna.content_complexity === 'high' ? '🚀 Advanced level' : dna.content_complexity === 'low' ? '🌱 Foundation level' : '📗 Standard level'}
+                </span>
+              </div>
+            )}
 
             {lesson.key_concepts?.length > 0 && (
               <div className="neura-card p-6 bg-[#06D6A0]/5">
