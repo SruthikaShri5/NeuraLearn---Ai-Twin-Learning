@@ -15,8 +15,8 @@ export const useClassStore = create((set, get) => ({
     try {
       const { data } = await api.get("/classes/my-classes");
       set({ myClasses: data.classes || [] });
-    } catch (err) {
-      console.error("fetchMyClasses error:", err);
+    } catch {
+      // silently fail
     } finally {
       set({ isLoading: false });
     }
@@ -31,8 +31,7 @@ export const useClassStore = create((set, get) => ({
         teacher: data.teacher || null,
       });
       return data;
-    } catch (err) {
-      console.error("fetchEnrolledClass error:", err);
+    } catch {
       return null;
     } finally {
       set({ isLoading: false });

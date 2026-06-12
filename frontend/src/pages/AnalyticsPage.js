@@ -125,7 +125,7 @@ export default function AnalyticsPage() {
                 </ResponsiveContainer>
                 <div className="mt-4 p-4 bg-white rounded-xl border-2 border-dashed border-[#118AB2]/30">
                   <p className="text-xs text-[#64748B] italic">
-                    "This chart shows how NeuraLearn is adapting to your unique strengths. Your {dnaData.sort((a,b)=>b.A-a.A)[0].subject} is your superpower today!"
+                    {`"This chart shows how NeuraLearn is adapting to your unique strengths. Your ${dnaData.sort((a,b)=>b.A-a.A)[0]?.subject || 'Accuracy'} is your superpower today!"`}
                   </p>
                 </div>
               </div>

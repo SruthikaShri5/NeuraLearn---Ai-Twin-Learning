@@ -75,7 +75,6 @@ export default function KnowledgeGraphPage() {
       setAllConcepts(conceptsData);
       setConcepts(conceptsData);
 
-      // Only show subjects present in the student's current grade
       const gradeSubjects = [...new Set(
         conceptsData
           .filter((c) => c.grade === grade)
@@ -83,10 +82,9 @@ export default function KnowledgeGraphPage() {
           .filter(Boolean)
       )];
       setAvailableSubjects(gradeSubjects);
-      // Reset subject filter when data loads
       setFilterSubject("all");
-    } catch (err) {
-      console.error("Knowledge graph fetch error:", err);
+    } catch {
+      // silently fail — graph shows empty state
     } finally {
       setLoading(false);
     }

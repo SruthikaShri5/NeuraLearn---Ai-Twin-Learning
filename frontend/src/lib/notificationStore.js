@@ -15,8 +15,7 @@ export const useNotificationStore = create((set, get) => ({
         unreadCount: data.unreadCount || 0,
       });
       return data;
-    } catch (err) {
-      console.error("fetchNotifications error:", err);
+    } catch {
       return null;
     }
   },
@@ -30,9 +29,7 @@ export const useNotificationStore = create((set, get) => ({
         ),
         unreadCount: Math.max(0, state.unreadCount - 1),
       }));
-    } catch (err) {
-      console.error("markAsRead error:", err);
-    }
+    } catch {}
   },
 
   markAllRead: async () => {
@@ -52,14 +49,10 @@ export const useNotificationStore = create((set, get) => ({
   broadcastMessage: async (classId, title, message, type = "announcement") => {
     try {
       const { data } = await api.post("/notifications/broadcast", {
-        classId,
-        title,
-        message,
-        type,
+        classId, title, message, type,
       });
       return data;
     } catch (err) {
-      console.error("broadcastMessage error:", err);
       throw err;
     }
   },

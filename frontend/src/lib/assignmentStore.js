@@ -22,8 +22,7 @@ export const useAssignmentStore = create((set, get) => ({
         },
       });
       return data;
-    } catch (err) {
-      console.error("fetchStudentAssignments error:", err);
+    } catch {
       return null;
     } finally {
       set({ isLoading: false });
@@ -36,8 +35,7 @@ export const useAssignmentStore = create((set, get) => ({
       const { data } = await api.get(`/assignments/class/${classId}`);
       set({ classAssignments: data.assignments || [] });
       return data;
-    } catch (err) {
-      console.error("fetchClassAssignments error:", err);
+    } catch {
       return null;
     } finally {
       set({ isLoading: false });
