@@ -632,13 +632,22 @@ async def get_lesson(lesson_id: str, request: Request):
         quiz = lesson.get("quiz", [])
 
         if quiz and len(quiz) >= 3:
+            import random as _random
+            # Seed shuffle per user+lesson so it's consistent within a session
+            rng = _random.Random(f"{user.get('_id', '')}-{lesson_id}")
+
             if complexity == "low":
-                # Foundation: first 3 questions only (simpler ones), add hint text
+                # Foundation: shuffle and take first 3, add hints, rewrite options order
+                shuffled = list(quiz)
+                rng.shuffle(shuffled)
                 adapted = []
-                for i, q in enumerate(quiz[:3]):
+                for q in shuffled[:3]:
                     q = dict(q)
                     q["difficulty_label"] = "Foundation"
-                    q["hint"] = f"Tip: Focus on the key concept from the lesson introduction."
+                    q["hint"] = "Tip: Focus on the key concept from the lesson introduction."
+                    opts = list(q.get("options", []))
+                    rng.shuffle(opts)
+                    q["options"] = opts
                     adapted.append(q)
                 lesson = dict(lesson)
                 lesson["quiz"] = adapted
@@ -646,13 +655,18 @@ async def get_lesson(lesson_id: str, request: Request):
                 lesson["quiz_note"] = "Quiz adapted to Foundation level — 3 questions to build confidence."
 
             elif complexity == "high":
-                # Advanced: all 5 questions + add challenge note
+                # Advanced: shuffle all, shuffle options, mark last 2 as challenge
+                shuffled = list(quiz)
+                rng.shuffle(shuffled)
                 adapted = []
-                for i, q in enumerate(quiz):
+                for i, q in enumerate(shuffled):
                     q = dict(q)
                     q["difficulty_label"] = "Advanced"
-                    if i >= 3:
-                        q["challenge"] = True  # marks last 2 as challenge questions
+                    if i >= len(shuffled) - 2:
+                        q["challenge"] = True
+                    opts = list(q.get("options", []))
+                    rng.shuffle(opts)
+                    q["options"] = opts
                     adapted.append(q)
                 lesson = dict(lesson)
                 lesson["quiz"] = adapted
@@ -660,8 +674,18 @@ async def get_lesson(lesson_id: str, request: Request):
                 lesson["quiz_note"] = "Quiz at Advanced level — all questions including challenge problems."
 
             else:
-                # Standard: all 5 questions, no changes
+                # Standard: shuffle question order and option order
+                shuffled = list(quiz)
+                rng.shuffle(shuffled)
+                adapted = []
+                for q in shuffled:
+                    q = dict(q)
+                    opts = list(q.get("options", []))
+                    rng.shuffle(opts)
+                    q["options"] = opts
+                    adapted.append(q)
                 lesson = dict(lesson)
+                lesson["quiz"] = adapted
                 lesson["quiz_difficulty"] = "standard"
                 lesson["quiz_note"] = "Quiz at Standard level."
 

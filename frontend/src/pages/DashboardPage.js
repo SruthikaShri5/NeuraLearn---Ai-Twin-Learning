@@ -267,6 +267,7 @@ export default function DashboardPage() {
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [showAchievements, setShowAchievements] = useState(false);
   const [recommendations, setRecommendations] = useState([]);
+  const [recoReason, setRecoReason] = useState([]);
 
   // Listen for XP updates from Focus Mode
   useEffect(() => {
@@ -295,7 +296,10 @@ export default function DashboardPage() {
         }
         fetchEnrolledClass().catch(() => {});
         fetchStudentAssignments().catch(() => {});
-        api.get("/recommendations").then(r => setRecommendations(r.data.recommendations || [])).catch(() => {});
+        api.get("/recommendations").then(r => {
+          setRecommendations(r.data.recommendations || []);
+          setRecoReason(r.data.based_on_weak || []);
+        }).catch(() => {});
       } catch {
         // Network failed — try cached lessons
         try {
@@ -345,10 +349,14 @@ export default function DashboardPage() {
     }
   }, [loading, disability, user?.name]);
 
-  // Show mood picker every 3 quizzes
+  // Refresh recommendations when user profile changes (after quiz)
   useEffect(() => {
-    if (quizCountSinceReport >= 3) setShowMoodPicker(true);
-  }, [quizCountSinceReport]);
+    if (!user?.learning_profile) return;
+    api.get("/recommendations").then(r => {
+      setRecommendations(r.data.recommendations || []);
+      setRecoReason(r.data.based_on_weak || []);
+    }).catch(() => {});
+  }, [user?.learning_profile?.weak_subjects?.length, user?.learning_profile?.content_complexity]); // eslint-disable-line
 
   // Teacher message toasts — show each message only once
   const shownMsgIds = useRef(new Set());
@@ -681,12 +689,26 @@ export default function DashboardPage() {
                   ? "rounded-xl border border-indigo-200 bg-indigo-50/60"
                   : "neura-card bg-[#C8B6FF]/10 border-[#C8B6FF]"
               }`}>
-                <div className="flex items-center gap-2 mb-3">
+                <div className="flex items-center gap-2 mb-1">
                   <Lightbulb className={`w-4 h-4 ${isSenior ? "text-indigo-500" : "text-[#7c3aed]"}`} />
                   <p className={`font-semibold text-sm ${isSenior ? "text-indigo-700" : "font-bold text-base text-[#7c3aed]"}`}>
                     {isJunior ? "✨ Neura suggests!" : "Recommended for you"}
                   </p>
                 </div>
+                {/* Show why — based on weak subjects from DNA */}
+                {recoReason.length > 0 && (
+                  <p className="text-[10px] text-[#6B7280] mb-3 leading-relaxed">
+                    🧬 Based on your Learning Twin: weak in{" "}
+                    <span className="font-semibold text-[#EF476F]">
+                      {recoReason.map(s => s.replace(/_/g, " ")).join(", ")}
+                    </span>
+                  </p>
+                )}
+                {recoReason.length === 0 && (
+                  <p className="text-[10px] text-[#6B7280] mb-3">
+                    {isJunior ? "🌟 Lessons you haven't tried yet!" : "Unattempted lessons for your grade"}
+                  </p>
+                )}
                 <div className="flex flex-col gap-2">
                   {recommendations.slice(0, 3).map(r => (
                     <Link key={r.id} to={`/lesson/${r.id}`}
@@ -695,7 +717,14 @@ export default function DashboardPage() {
                           ? "rounded-lg border border-indigo-200 bg-white text-indigo-700 font-medium hover:border-indigo-400 hover:shadow-sm"
                           : "font-bold rounded-xl border-2 bg-white border-[#C8B6FF] text-[#7c3aed] hover:shadow-sm"
                       }`}>
-                      {isSenior ? r.title : `📚 ${r.title}`}
+                      <span className="block">{isSenior ? r.title : `📚 ${r.title}`}</span>
+                      {r.subject && (
+                        <span className={`text-[10px] font-normal mt-0.5 block ${
+                          isSenior ? "text-indigo-400" : "text-[#9CA3AF]"
+                        }`}>
+                          {r.subject.replace(/_/g, " ")}
+                        </span>
+                      )}
                     </Link>
                   ))}
                 </div>

@@ -260,6 +260,9 @@ export default function LessonPage() {
     return () => delete window.__trackHint;
   }, []);
 
+  // Scroll to top on lesson open and on phase change
+  useEffect(() => { window.scrollTo(0, 0); }, [lessonId, phase]);
+
   useEffect(() => {
     const fetchLesson = async () => {
       try {
