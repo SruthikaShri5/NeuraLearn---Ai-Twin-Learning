@@ -754,18 +754,44 @@ export default function LessonPage() {
                 Question {currentQ + 1} of {quiz.length}
               </h2>
               <div className="flex items-center gap-2">
+                {lesson.quiz_difficulty && (
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                    lesson.quiz_difficulty === 'advanced'   ? 'bg-emerald-50 border-emerald-300 text-emerald-700' :
+                    lesson.quiz_difficulty === 'foundation' ? 'bg-amber-50 border-amber-300 text-amber-700' :
+                    'bg-sky-50 border-sky-300 text-sky-700'
+                  }`}>
+                    {lesson.quiz_difficulty === 'advanced' ? '🚀 Advanced' : lesson.quiz_difficulty === 'foundation' ? '🌱 Foundation' : '📗 Standard'}
+                  </span>
+                )}
                 <Badge className="bg-[#C8B6FF] text-[#0F172A] border-2 border-[#0F172A]">Quiz</Badge>
                 {disability === "visual" && (
                   <ReadAloudBtn text={currentQuestion.question} label="Read question" />
                 )}
               </div>
             </div>
+            {lesson.quiz_note && (
+              <p className="text-xs text-[#6B7280] bg-[#f8fafc] px-3 py-1.5 rounded-lg border border-[#e2e8f0]">
+                🧬 {lesson.quiz_note}
+              </p>
+            )}
             <Progress value={((currentQ + 1) / quiz.length) * 100} className="h-3 bg-[#e2e8f0]" />
 
             <div className={`neura-card ${disability === "motor" ? 'p-10' : 'p-8'}`}>
               <p className={`font-bold text-[#0F172A] mb-6 ${disability === "motor" ? 'text-2xl' : 'text-xl'}`} data-testid="quiz-question">
                 {currentQuestion.question}
               </p>
+              {/* Foundation hint */}
+              {currentQuestion.hint && (
+                <div className="mb-4 px-3 py-2 rounded-lg bg-amber-50 border border-amber-200 text-xs text-amber-700 font-medium">
+                  💡 {currentQuestion.hint}
+                </div>
+              )}
+              {/* Advanced challenge badge */}
+              {currentQuestion.challenge && (
+                <div className="mb-4 px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200 text-xs text-emerald-700 font-bold inline-flex items-center gap-1">
+                  🚀 Challenge Question
+                </div>
+              )}
 
               {/* Motor: keyboard-navigable quiz */}
               {disability === "motor" ? (

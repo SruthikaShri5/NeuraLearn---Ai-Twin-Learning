@@ -620,10 +620,54 @@ async def get_lessons(request: Request, grade: Optional[str] = None, subject: Op
 
 
 @api_router.get("/lessons/{lesson_id}")
-async def get_lesson(lesson_id: str):
+async def get_lesson(lesson_id: str, request: Request):
     lesson = await db.lessons.find_one({"id": lesson_id}, {"_id": 0})
     if not lesson:
         raise HTTPException(status_code=404, detail="Lesson not found")
+
+    # Adapt quiz based on Learning Twin DNA content_complexity
+    try:
+        user = await get_current_user(request)
+        complexity = user.get("learning_profile", {}).get("content_complexity", "medium")
+        quiz = lesson.get("quiz", [])
+
+        if quiz and len(quiz) >= 3:
+            if complexity == "low":
+                # Foundation: first 3 questions only (simpler ones), add hint text
+                adapted = []
+                for i, q in enumerate(quiz[:3]):
+                    q = dict(q)
+                    q["difficulty_label"] = "Foundation"
+                    q["hint"] = f"Tip: Focus on the key concept from the lesson introduction."
+                    adapted.append(q)
+                lesson = dict(lesson)
+                lesson["quiz"] = adapted
+                lesson["quiz_difficulty"] = "foundation"
+                lesson["quiz_note"] = "Quiz adapted to Foundation level — 3 questions to build confidence."
+
+            elif complexity == "high":
+                # Advanced: all 5 questions + add challenge note
+                adapted = []
+                for i, q in enumerate(quiz):
+                    q = dict(q)
+                    q["difficulty_label"] = "Advanced"
+                    if i >= 3:
+                        q["challenge"] = True  # marks last 2 as challenge questions
+                    adapted.append(q)
+                lesson = dict(lesson)
+                lesson["quiz"] = adapted
+                lesson["quiz_difficulty"] = "advanced"
+                lesson["quiz_note"] = "Quiz at Advanced level — all questions including challenge problems."
+
+            else:
+                # Standard: all 5 questions, no changes
+                lesson = dict(lesson)
+                lesson["quiz_difficulty"] = "standard"
+                lesson["quiz_note"] = "Quiz at Standard level."
+
+    except Exception:
+        pass  # unauthenticated or error — serve default quiz
+
     return {"lesson": lesson}
 
 
