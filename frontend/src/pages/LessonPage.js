@@ -887,6 +887,40 @@ export default function LessonPage() {
               )}
             </div>
 
+            {/* DNA Adaptation callout — shows exactly what changed */}
+            {dna.content_complexity && (
+              <div className="neura-card p-4 bg-gradient-to-r from-[#f5f0ff] to-[#eef9f6] border border-[#C8B6FF]/60">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-base">🧬</span>
+                  <p className="font-bold text-sm text-[#5b21b6]">Your Learning Twin has updated</p>
+                  <span className="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse" style={{ background: "rgba(6,214,160,0.15)", color: "#047857", border: "1px solid rgba(6,214,160,0.4)" }}>● LIVE</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="rounded-lg p-2 text-center border bg-violet-50 border-violet-200">
+                    <p className="font-bold text-sm text-violet-700 capitalize">{dna.learning_style || 'visual'}</p>
+                    <p className="text-[10px] text-[#6B7280] uppercase tracking-wider mt-0.5">Style</p>
+                  </div>
+                  <div className={`rounded-lg p-2 text-center border ${
+                    dna.content_complexity === 'high' ? 'bg-emerald-50 border-emerald-200' :
+                    dna.content_complexity === 'low'  ? 'bg-amber-50 border-amber-200' :
+                    'bg-sky-50 border-sky-200'
+                  }`}>
+                    <p className={`font-bold text-sm capitalize ${
+                      dna.content_complexity === 'high' ? 'text-emerald-700' :
+                      dna.content_complexity === 'low'  ? 'text-amber-700' : 'text-sky-700'
+                    }`}>{dna.content_complexity || 'medium'}</p>
+                    <p className="text-[10px] text-[#6B7280] uppercase tracking-wider mt-0.5">Next Lesson</p>
+                  </div>
+                </div>
+                <p className="text-xs text-[#374151] mt-2 px-1">
+                  🤖 <span className="font-semibold text-[#5b21b6]">Your next lesson will adapt:</span>{" "}
+                  {dna.content_complexity === 'high' ? 'Advanced content unlocked — deeper applications awaiting.' :
+                   dna.content_complexity === 'low'  ? 'Step-by-step mode activated — we\'ll build your confidence.' :
+                   `${dna.learning_style || 'visual'} layout at standard level — tuned from your ${Math.round(dna.avg_quiz_accuracy || 0)}% accuracy.`}
+                </p>
+              </div>
+            )}
+
             {/* Question Review Section */}
             <div className="space-y-4 text-left">
               <h3 className={`font-bold text-[#0F172A] ${isJunior ? "text-xl" : "text-lg"}`} style={headingFont}>

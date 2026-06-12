@@ -17,13 +17,14 @@ const QUICK_PROMPTS = {
   senior:    ["Explain the concept", "Give a worked example", "What are common mistakes?", "What can you do?"],
 };
 
-async function callBackend({ message, history, lessonContext, disability, grade, emotionState }) {
+async function callBackend({ message, history, lessonContext, disability, grade, emotionState, learningProfile }) {
   const res = await api.post("/ai/tutor", {
     message,
     lesson_context: lessonContext || "",
     disability_type: disability,
     grade_level: grade,
     emotion_state: emotionState || "neutral",
+    learning_profile: learningProfile || {},
     history: history.slice(-6).map((m) => ({
       role: m.role === "assistant" ? "assistant" : "user",
       content: m.text || "",
@@ -98,6 +99,8 @@ export default function AITutor({ onClose, lessonContext = "" }) {
   const isTTSActive = user?.learning_profile?.tts_active || user?.disability_type === "visual";
   const grade = user?.grade_level || "class_5";
   const disability = user?.disability_type || "prefer_not_to_say";
+  // Always read live DNA from user — updates after every quiz
+  const learningProfile = user?.learning_profile || {};
 
   const welcomeMsg = getWelcomeMessage(user, disability, isJunior);
 
@@ -129,6 +132,7 @@ export default function AITutor({ onClose, lessonContext = "" }) {
         disability,
         grade,
         emotionState,
+        learningProfile,
       });
       setMessages((m) => [...m, { role: "assistant", text: reply }]);
       if (isTTSActive) speak(reply);
@@ -188,6 +192,28 @@ export default function AITutor({ onClose, lessonContext = "" }) {
           </button>
         </div>
       </div>
+
+      {/* Live DNA status strip */}
+      {learningProfile.content_complexity && (
+        <div className="flex items-center gap-2 px-3 py-1.5 bg-[#f8fafc] border-b border-[#e2e8f0] shrink-0 overflow-x-auto">
+          <span className="text-[9px] font-black uppercase tracking-widest text-[#9CA3AF] shrink-0">🧬 Twin:</span>
+          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${
+            learningProfile.content_complexity === 'high' ? 'bg-[#06D6A0]/15 text-[#065f46]' :
+            learningProfile.content_complexity === 'low'  ? 'bg-[#FFD166]/20 text-[#b8860b]' :
+            'bg-[#118AB2]/10 text-[#118AB2]'
+          }`}>
+            {learningProfile.content_complexity === 'high' ? '🚀 Advanced' : learningProfile.content_complexity === 'low' ? '🌱 Foundation' : '📗 Standard'}
+          </span>
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#C8B6FF]/20 text-[#7c3aed] shrink-0">
+            {learningProfile.learning_style || 'visual'}
+          </span>
+          {learningProfile.avg_quiz_accuracy > 0 && (
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#f1f5f9] text-[#64748B] shrink-0">
+              {Math.round(learningProfile.avg_quiz_accuracy)}% avg
+            </span>
+          )}
+        </div>
+      )}
 
       {/* Quick prompts */}
       <div className="flex gap-1.5 px-3 py-2 overflow-x-auto shrink-0 border-b border-[#e2e8f0]">
