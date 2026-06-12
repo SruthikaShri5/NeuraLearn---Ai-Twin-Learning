@@ -29,6 +29,7 @@ import NotificationsDropdown from "@/components/NotificationsDropdown";
 import MessageChat from "@/components/MessageChat";
 import { useClassStore } from "@/lib/classStore";
 import { useAssignmentStore } from "@/lib/assignmentStore";
+import { cacheLessons, getCachedLessons } from "@/lib/offlineDB";
 import {
   Brain, BookOpen, BarChart3, Settings, LogOut, Trophy,
   Zap, ArrowRight, Wind, Bot, Camera, Music,
@@ -285,12 +286,26 @@ export default function DashboardPage() {
           api.get("/lessons"),
           api.get("/spaced-repetition/due").catch(() => ({ data: { due_reviews: [] } })),
         ]);
-        setLessons(lessonsRes.data.lessons || []);
+        const fetchedLessons = lessonsRes.data.lessons || [];
+        setLessons(fetchedLessons);
         setDueReviews(reviewsRes.data.due_reviews || []);
+        // Cache lessons for offline use
+        if (fetchedLessons.length > 0) {
+          cacheLessons(fetchedLessons).catch(() => {});
+        }
         fetchEnrolledClass().catch(() => {});
         fetchStudentAssignments().catch(() => {});
         api.get("/recommendations").then(r => setRecommendations(r.data.recommendations || [])).catch(() => {});
-      } catch {} finally { setLoading(false); }
+      } catch {
+        // Network failed — try cached lessons
+        try {
+          const cached = await getCachedLessons();
+          if (cached.length > 0) {
+            setLessons(cached);
+            toast("📶 Offline — showing cached lessons", { duration: 3000 });
+          }
+        } catch {}
+      } finally { setLoading(false); }
     };
     fetchData();
   }, [setLessons, fetchEnrolledClass, fetchStudentAssignments]);

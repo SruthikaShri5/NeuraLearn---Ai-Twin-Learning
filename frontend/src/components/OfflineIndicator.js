@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useAppStore } from "@/lib/store";
 import { useGradeTheme } from "@/lib/useGradeTheme";
 import { WifiOff, Wifi, RefreshCw, CloudOff } from "lucide-react";
-import { getPendingQuizzes, syncPendingQuizzes } from "@/lib/offlineDB";
+import { getPendingQuizzes, syncPendingQuizzes, cacheLessons, getCachedLessons } from "@/lib/offlineDB";
 import api from "@/lib/api";
 
 export default function OfflineIndicator() {

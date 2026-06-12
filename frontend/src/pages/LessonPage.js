@@ -17,6 +17,7 @@ import { playFeedback } from "@/lib/soundscape";
 import VideoPlayer from "@/components/VideoPlayer";
 import VoiceAssistant from "@/components/VoiceAssistant";
 import { speak, stopSpeaking } from "@/lib/tts";
+import { cacheLessons, getCachedLessons } from "@/lib/offlineDB";
 
 // "--€ Caption Overlay for Hearing disability "--------------------------------€
 function CaptionOverlay({ text }) {
@@ -264,11 +265,26 @@ export default function LessonPage() {
       try {
         const { data } = await api.get(`/lessons/${lessonId}`);
         setLesson(data.lesson);
-        // Auto-read for visual disability
+        // Cache this lesson for offline access
+        cacheLessons([data.lesson]).catch(() => {});
         if ((disability === "visual" || disability === "dyslexia" || disabilityProfile.autoRead) && data.lesson?.introduction) {
           setTimeout(() => speak(`Lesson: ${data.lesson.title}. ${data.lesson.introduction}`), 500);
         }
-      } catch { navigate("/dashboard"); }
+      } catch (err) {
+        // Network failed — try to serve from IndexedDB cache
+        try {
+          const cached = await getCachedLessons();
+          const found = cached.find(l => l.id === lessonId);
+          if (found) {
+            setLesson(found);
+            if ((disability === "visual" || disability === "dyslexia" || disabilityProfile.autoRead) && found?.introduction) {
+              setTimeout(() => speak(`Lesson: ${found.title}. ${found.introduction}`), 500);
+            }
+            return;
+          }
+        } catch {}
+        navigate("/dashboard");
+      }
       finally { setLoading(false); }
     };
     fetchLesson();
