@@ -356,7 +356,7 @@ export default function LessonPage() {
         });
       }
     } catch (err) {
-      console.error("Quiz submit error:", err);
+      // Quiz submit failed — try offline queue then show local result
       // Save offline if network failed
       if (!err.response) {
         try {

@@ -260,8 +260,8 @@ export default function TeacherDashboardPage() {
         setAtRisk(riskRes.data.at_risk || []);
         setMisconceptions(misconceptionsRes.data.misconceptions || []);
         fetchMyClasses().catch(() => {});
-      } catch (e) {
-        console.error(e);
+      } catch {
+        // silently fail — show empty state
       } finally {
         setLoading(false);
       }
