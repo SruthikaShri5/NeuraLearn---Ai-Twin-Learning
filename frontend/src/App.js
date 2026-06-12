@@ -1,7 +1,7 @@
 import "@/App.css";
 import "@/disability-transforms.css";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { AuthProvider, useAuth } from "@/lib/auth-context";
 import { useAppStore, getGradeGroup } from "@/lib/store";
 import { updateFavicon } from "@/lib/dynamicFavicon";
@@ -27,6 +27,8 @@ import KeyboardShortcuts from "@/components/KeyboardShortcuts";
 import { Toaster } from "@/components/ui/sonner";
 
 function LoadingScreen() {
+  const [slow, setSlow] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setSlow(true), 4000); return () => clearTimeout(t); }, []);
   return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: "#FAFAFA" }}>
       <div className="text-center">
@@ -34,7 +36,12 @@ function LoadingScreen() {
           <span className="text-3xl">🧠</span>
         </div>
         <p className="text-lg font-bold text-[#1A1A2E] mb-1" style={{ fontFamily: "Fredoka, sans-serif" }}>NeuraLearn</p>
-        <p className="text-sm text-[#6B7280] mb-4">An app that learns how you learn</p>
+        <p className="text-sm text-[#6B7280] mb-1">An app that learns how you learn</p>
+        {slow && (
+          <p className="text-xs text-[#94a3b8] mb-4 max-w-xs mx-auto">
+            Waking up the server — this takes ~15s on first visit ☕
+          </p>
+        )}
         <div className="flex items-center justify-center gap-1.5">
           <span className="w-2 h-2 rounded-full bg-[#118AB2] animate-bounce" style={{ animationDelay: "0ms" }} />
           <span className="w-2 h-2 rounded-full bg-[#06D6A0] animate-bounce" style={{ animationDelay: "150ms" }} />
@@ -74,7 +81,11 @@ function AppContent() {
   // Wake up backend on app start (Render free tier cold start)
   useEffect(() => {
     const backendUrl = process.env.REACT_APP_BACKEND_URL || "https://neuralearn-backend.onrender.com";
-    fetch(`${backendUrl}/api/health`, { method: "GET", cache: "no-cache" }).catch(() => {});
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 30000);
+    fetch(`${backendUrl}/api/health`, { method: "GET", cache: "no-cache", signal: controller.signal })
+      .catch(() => {})
+      .finally(() => clearTimeout(timer));
   }, []);
 
   // Apply grade group and disability from user

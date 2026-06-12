@@ -111,7 +111,7 @@ The moment a disability is selected during signup, NeuraLearn **automatically tr
 - Accessibility Bot — voice or text commands to control settings instantly
 
 ---
-pl
+
 ## 🛠️ Tech Stack
 
 ### Frontend
